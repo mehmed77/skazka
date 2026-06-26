@@ -143,6 +143,7 @@ REST_FRAMEWORK = {
         "register": "30/hour",
         "profiles": "120/hour",
         "pin_entry": "5/min",  # PIN brute-force himoyasi (enter)
+        "content": "240/min",  # curriculum/lesson o'qish (saxiy — har dars yuklashda)
     },
 }
 
@@ -190,7 +191,12 @@ AWS_STORAGE_BUCKET_NAME = env("MINIO_BUCKET", default="skazka-media")
 AWS_S3_ENDPOINT_URL = env("MINIO_ENDPOINT", default="http://minio:9000")
 AWS_S3_REGION_NAME = env("MINIO_REGION", default="us-east-1")
 AWS_DEFAULT_ACL = None
-AWS_QUERYSTRING_AUTH = True  # private bucket
+# Bolalar o'quv kontenti media'si PUBLIC (ADR — download-proxy QURILMADI): signed query yo'q,
+# brauzer uchun public domen (dev: localhost:9000/<bucket>; prod: CDN — env orqali).
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_CUSTOM_DOMAIN = env("MINIO_PUBLIC_DOMAIN", default="localhost:9000/skazka-media")
+AWS_S3_URL_PROTOCOL = env("MINIO_URL_PROTOCOL", default="http:")
+AWS_S3_FILE_OVERWRITE = False  # storage_key UUID — dublikat ustiga yozmaydi
 
 STORAGES = {
     "default": {"BACKEND": "storages.backends.s3.S3Storage"},

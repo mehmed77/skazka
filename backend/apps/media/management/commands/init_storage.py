@@ -34,6 +34,24 @@ class Command(BaseCommand):
                 self.stdout.write(
                     self.style.SUCCESS(f"[init_storage] '{bucket}' yaratildi")
                 )
+            # Bolalar o'quv kontenti — PUBLIC-READ (download-proxy yo'q, ADR). Anonim GetObject.
+            import json
+
+            policy = {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {"AWS": ["*"]},
+                        "Action": ["s3:GetObject"],
+                        "Resource": [f"arn:aws:s3:::{bucket}/*"],
+                    }
+                ],
+            }
+            s3.put_bucket_policy(Bucket=bucket, Policy=json.dumps(policy))
+            self.stdout.write(
+                f"[init_storage] '{bucket}' public-read policy o'rnatildi"
+            )
         except Exception as exc:  # noqa: BLE001 — boot'ni to'xtatmaymiz
             self.stdout.write(
                 self.style.WARNING(

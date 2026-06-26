@@ -2,7 +2,7 @@
 title: Media moduli
 type: modul
 tags: [modul/media, loyiha, devops]
-status: rejada
+status: bajarildi
 faza: Faza 3
 created: 2026-06-26
 ---

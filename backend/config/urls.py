@@ -40,6 +40,7 @@ _profiles_router.register("profiles", ChildProfileViewSet, basename="profile")
 api_v1 = [
     path("auth/", include("apps.accounts.urls")),
     *_profiles_router.urls,
+    path("", include("apps.content.urls")),
 ]
 
 urlpatterns = [

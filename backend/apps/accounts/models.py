@@ -134,6 +134,15 @@ class ChildProfile(BaseModel):
     l1_locale = models.CharField("ona tili", max_length=8, default="uz")
     pin = models.CharField("PIN (hash)", max_length=128, blank=True, default="")
     is_active = models.BooleanField(default=True)
+    # Bolaning joriy darajasi (kurikulum uchun). Faza 6 rivoj bilan to'ldiriladi.
+    current_level = models.ForeignKey(
+        "content.Level",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name="joriy daraja",
+    )
 
     class Meta(BaseModel.Meta):
         verbose_name = "Bola profili"

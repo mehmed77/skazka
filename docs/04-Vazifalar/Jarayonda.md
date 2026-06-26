@@ -13,20 +13,20 @@ created: 2026-06-26
 > bu yerga ko'chiriladi, tugaganda `[x]` qilinib [[04-Vazifalar/Bajarilgan|Bajarilgan]]'ga o'tadi.
 
 > [!info] Hozirgi holat
-> **Faza 0, 1, 2** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
-> Hozir taxta **bo'sh**: Faza 3'ga tayyorgarlik.
+> **Faza 0, 1, 2, 2.5, 3** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
+> Hozir taxta **bo'sh**: Faza 4'ga tayyorgarlik.
 
-## 🟡 Faza 3 ga tayyorgarlik
-Faza 3 ([[SPEC]] §9.2, §7.3) — Media pipeline + kontent API. Boshlashdan oldin:
+## 🟡 Faza 4 ga tayyorgarlik
+Faza 4 ([[SPEC]] §7) — Dizayn tizimi + bolalar UI qobig'i (PWA). Boshlashdan oldin:
 
-- [ ] `config_json`/`schema_json` strukturasini Faza 5/6 nuqtai nazaridan ko'rib chiqish #modul/content → [[06-Modullar/Kontent|📚 Kontent]]
-- [ ] Media public URL (`minio:9000`→`localhost:9000`/CDN) + RBAC download-proxy #modul/media → [[06-Modullar/Media|🎨 Media]]
-- [ ] Kontent API shakli: `GET /api/v1/curriculum/`, `GET /api/v1/lesson/{id}/` (media URL bilan) #modul/content → [[02-Arxitektura/API-Dizayni|🔌 API]]
+- [ ] Dizayn tokenlari (CSS o'zgaruvchilari) — issiq/yorqin/rang-ko'r xavfsiz palitra (mavjud `globals.css` kengaytma) #modul/frontend → [[06-Modullar/Dizayn-Tizimi|🎨 Dizayn]]
+- [ ] `useAudio` (audio-birinchi) — kontent API'dan media URL bilan ulanish #modul/frontend
+- [ ] Mishka maskot holatlari (idle/cheer/think/celebrate) + sayohat xaritasi (curriculum'dan) #modul/frontend
 
 > [!tip] Pull nomzodlari (WIP ≤ 3)
-> 1. Media Celery pipeline (audio normalize/transcode, rasm optimize) `#prioritet/high`
-> 2. Kontent API (`/api/v1/curriculum`, `/api/v1/lesson/{id}`) + DRF serializerlar + Redis kesh/ETag `#prioritet/high`
-> 3. Media RBAC download-proxy + public URL `#prioritet/medium`
+> 1. Dizayn tizimi: tokenlar + ulkan tugma/kartochka/modal + Mishka komponenti `#prioritet/high`
+> 2. Bolalar uy ekrani: sayohat xaritasi (`/api/v1/curriculum`) + audio-birinchi navigatsiya `#prioritet/high`
+> 3. PWA o'rnatish + to'liq ekran + offline qobiq (`frontend-design` skill) `#prioritet/medium`
 
 ## ⛔ Bloklangan (Blocked)
 _(Yo'q)_

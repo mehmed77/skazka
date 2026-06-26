@@ -2,8 +2,9 @@
 
 import pytest
 from django.core.management import call_command
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.accounts.models import ParentAccount
+from apps.accounts.models import ChildProfile, ParentAccount
 from apps.content.models import (
     GameType,
     Language,
@@ -120,3 +121,104 @@ def test_admin_pages_load(client):
         "/admin/media/media/",
     ]:
         assert client.get(url).status_code == 200, url
+
+
+# ── Faza 3: kontent API (bola-kontekst, age_band, resolve, kesh) ─────
+
+
+def _child_ctx(api, parent, child):
+    """Bola-kontekst token (enter chiqargandek) bilan klientni sozlaydi."""
+    access = RefreshToken.for_user(parent).access_token
+    access["parent_id"] = str(parent.id)
+    access["active_child_id"] = str(child.id)
+    api.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
+    return api
+
+
+@pytest.mark.django_db
+def test_curriculum_requires_child_context(api, parent):
+    access = RefreshToken.for_user(parent).access_token  # active_child_id YO'Q
+    api.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
+    assert api.get("/api/v1/curriculum/").status_code == 403
+
+
+@pytest.mark.django_db
+def test_curriculum_foreign_child_forbidden(api, parent, parent_b):
+    other = ChildProfile.objects.create(
+        parent=parent_b, display_name="Begona", age_band="3-4"
+    )
+    access = RefreshToken.for_user(parent).access_token
+    access["active_child_id"] = str(other.id)  # parent A token, parent B bolasi
+    api.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
+    assert api.get("/api/v1/curriculum/").status_code == 403
+
+
+@pytest.mark.django_db
+def test_curriculum_age_band_filter(api, parent):
+    call_command("seed_content")
+    theme = Theme.objects.get(key="animals_home")
+    Lesson.objects.create(
+        theme=theme, order=9, title_uz="Katta dars", min_age_band="6-7"
+    )
+
+    def titles(resp):
+        return [
+            ls["title_uz"]
+            for lvl in resp.data["levels"]
+            for th in lvl["themes"]
+            for ls in th["lessons"]
+        ]
+
+    child34 = ChildProfile.objects.create(
+        parent=parent, display_name="A", age_band="3-4"
+    )
+    r34 = _child_ctx(api, parent, child34).get("/api/v1/curriculum/")
+    assert r34.status_code == 200
+    assert "Katta dars" not in titles(r34)  # 3-4 bola 6-7 darsni ko'rmaydi
+
+    child67 = ChildProfile.objects.create(
+        parent=parent, display_name="B", age_band="6-7"
+    )
+    r67 = _child_ctx(api, parent, child67).get("/api/v1/curriculum/")
+    assert "Katta dars" in titles(r67)  # 6-7 bola ko'radi
+
+
+@pytest.mark.django_db
+def test_lesson_resolves_config(api, parent):
+    call_command("seed_content")
+    lesson = Lesson.objects.filter(theme__key="animals_home").first()
+    child = ChildProfile.objects.create(parent=parent, display_name="A", age_band="6-7")
+    r = _child_ctx(api, parent, child).get(f"/api/v1/lesson/{lesson.id}/")
+    assert r.status_code == 200
+    practice = next(s for s in r.data["steps"] if s["kind"] == "practice")
+    item = practice["new_items"][0]
+    assert item["type"] == "word" and "lemma" in item
+    assert (
+        "image_url" in item and "audio_url" in item
+    )  # media null bo'lsa ham kalit bor
+    assert "confusable_ids" in item
+    eb = next(g for g in practice["games"] if g["type"] == "eshit_va_bos")
+    assert eb["schema"]  # GameType.schema_json birga keldi
+    assert r.has_header("ETag")
+
+
+@pytest.mark.django_db
+def test_lesson_age_band_forbidden(api, parent):
+    call_command("seed_content")
+    theme = Theme.objects.get(key="animals_home")
+    hard = Lesson.objects.create(
+        theme=theme, order=8, title_uz="Qiyin", min_age_band="6-7"
+    )
+    child = ChildProfile.objects.create(parent=parent, display_name="A", age_band="3-4")
+    r = _child_ctx(api, parent, child).get(f"/api/v1/lesson/{hard.id}/")
+    assert r.status_code == 403
+
+
+@pytest.mark.django_db
+def test_content_version_bumps_on_save():
+    from apps.content.cache import content_version
+
+    v1 = content_version()
+    ru = Language.objects.get_or_create(code="ru", defaults={"name": "ru"})[0]
+    Word.objects.create(language=ru, lemma="тест-кеш")
+    assert content_version() > v1  # kesh invalidatsiya signali

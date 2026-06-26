@@ -28,6 +28,7 @@ created: 2026-06-26
 | [[#ADR-008 — Ruscha alohida git repo\|ADR-008]] | Repo ajratish | ✅ qabul qilingan |
 | [[#ADR-009 — Faza 1 xavfsizlik qotirish va kechiktirilgan elementlar\|ADR-009]] | Auth xavfsizligi | ✅ qabul qilingan |
 | [[#ADR-010 — Kontent kontrakti (confusable + config_json v2 + SRS)\|ADR-010]] | Kontent/SRS kontrakti | ✅ qabul qilingan |
+| [[#ADR-011 — Faza 3 xavfsizlik review + public-media xulosasi\|ADR-011]] | Public media + media/API xavfsizligi | ✅ qabul qilingan |
 
 ---
 
@@ -96,6 +97,33 @@ created: 2026-06-26
   4. **`soz_qur` bo'g'in** bo'shlig'i Faza 7'ga hujjatlandi (kod yo'q) → [[06-Modullar/Kontent#Ma'lum bo'shliqlar (Known gaps)]].
 - **Chegara:** Dvigatel/API/distractor-logikasi/bo'g'in YO'Q — faqat model + config shakli + hujjat. Migratsiya additiv (`content.0002`). 23 pytest yashil.
 - **Oqibat:** Faza 3 API barqaror kontent kontraktiga tayanadi; Faza 5/6 (dvigatel, SRS) kengaytirilgan strukturaga tayyor. Qarang [[06-Modullar/Kontent]], [[06-Modullar/SRS-Learning]].
+
+## ADR-011 — Faza 3 xavfsizlik review + public-media xulosasi
+- **Holat:** ✅ qabul qilingan (2026-06-27)
+- **Kontekst:** Faza 3 (media pipeline + kontent API) 3 yangi xavf yuzasi kiritdi: public media, bola-kontekst authz, age_band ruxsati. Commit'dan oldin ko'p-agentli adversarial review (28 agent, 4 lens) + live empirik probalar o'tkazildi.
+
+### 🔑 Public-media XULOSASI: **QAROR XAVFSIZ** (non-sensitive o'quv kontenti uchun)
+Empirik tasdiqlandi: bucket policy **faqat `s3:GetObject`** — anonim **GET→200, LIST→403, PUT→403, DELETE→403** (obyekt o'chmadi); `storage_key` **UUID4** (enumerable emas). Media — o'quv kontenti, **PII emas**.
+→ **Download-proxy SHART EMAS.** Sabablar: (a) maxfiy emas; (b) proxy har media so'rovini Django'dan o'tkazib, bolalar ilovasidagi yuzlab audio/rasmni sekinlashtirardi; (c) CDN/keshlash public URL bilan tabiiy.
+> [!warning] SHARTLAR (buzilmasin)
+> - Bu bucket'ga **FAQAT o'quv media** (audio/rasm/lottie) tushadi — **PII/zaxira/log HECH QACHON**.
+> - Kelajakda **premium/maxfiy** kontent bo'lsa — **o'shanda** signed URL (`AWS_QUERYSTRING_AUTH=True`) yoki RBAC-proxy qo'shiladi (hozir emas).
+
+### ✅ Tuzatildi (real + arzon + faza-mos)
+- **MIME confusion (SVG-XSS):** kengaytma-validator yetarli emas edi — endi rasm uchun **PIL KONTENT tekshiruvi** (SVG'ni `.png` nomi bilan yuklab bo'lmaydi). Live tasdiq: SVG-as-png → RAD.
+- **Pillow decompression bomb (DoS):** `Image.MAX_IMAGE_PIXELS=40MP` (upload validator + task) + 25MB hajm cap.
+- **Content endpoint throttle:** `curriculum`/`lesson` → `content` (240/min) defense-in-depth.
+
+### ❌ Rad etildi (sabab bilan)
+- **"age_band PATCH bilan o'zgaradi"** — xavf EMAS: ota-ona **O'Z** bolasini boshqaradi (cross-tenant bloklangan, kontent maxfiy emas, age'ni to'g'rilash qonuniy). `read_only` qilish qonuniy yangilanishni buzardi. Mahsulot qarori, security emas.
+- **"Curriculum ETag mismatch"** — aslida TO'G'RI: ETag har-bola (`child.id`, javobda `child{}` bor), `levels` keshi age_band bo'yicha (bola-independent). Reviewer taklifi (ETag→age_band) **leak keltirardi** (B display_name → A). O'zgartirilmadi.
+
+### ⏭️ Kechiktirildi (hujjatlangan)
+- SECRET_KEY dev-default (prod allaqachon majburiy — ADR-009; dev `.env` beradi).
+- `AGE_RANK` noma'lum qiymat (TextChoices + serializer choices cheklaydi).
+- Unbounded `file.read()` (25MB upload cap + anonim PUT yo'q → mitigatsiya).
+- To'liq rate-limit/WAF infra → Faza 10 (sayqal).
+- **Oqibat:** Media/kontent qatlami xavfsizlik tasdig'i bilan git'ga muhrlandi; public-media qarori rasman tasdiqlandi. 32 pytest yashil. Qarang [[06-Modullar/Media]], [[02-Arxitektura/Xavfsizlik]].
 
 ---
 

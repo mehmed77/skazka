@@ -11,6 +11,24 @@ created: 2026-06-26
 > Bog'liq: [[04-Vazifalar/Backlog|📥 Backlog]] · [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[03-Reja/Bosqichlar#Faza 0|🪜 Faza 0]]
 > Tugagan vazifalar shu yerga sana bilan ko'chiriladi (eng yangisi tepada).
 
+## ✅ Faza 3 — Media pipeline + kontent API (2026-06-27)
+[[SPEC]] §9.2, §7.3 — frontend kontentni o'qiy oladigan birinchi faza. **Additiv.** Security review o'tdi.
+
+- [x] Media Celery pipeline: `optimize_image` (Pillow: thumb/full, WebP+PNG, o'lcham), `normalize_audio` (mutagen duration + ffmpeg mp3/ogg, **tolerant**) ✅ 2026-06-27 #modul/media → [[06-Modullar/Media|🎨 Media]]
+- [x] `post_save` auto-enqueue (transaction.on_commit, tolerant, loop-himoya) + `init_storage` **public-read** policy ✅ 2026-06-27 #modul/media
+- [x] Media **PUBLIC URL** (download-proxy yo'q): `AWS_S3_CUSTOM_DOMAIN`, `QUERYSTRING_AUTH=False`, UUID `upload_to` ✅ 2026-06-27 #modul/media
+- [x] `ChildProfile.current_level` FK (additiv) ✅ 2026-06-27 #modul/accounts
+- [x] `GET /api/v1/curriculum/` — bola-kontekst (`active_child_id`, EGALIK tekshiruvi), **age_band filtri**, progress stub ✅ 2026-06-27 #modul/content → [[02-Arxitektura/API-Dizayni|🔌 API]]
+- [x] `GET /api/v1/lesson/{id}/` — `config_json` to'liq RESOLVE (so'z/harf + absolyut media URL + games+schema + confusable), age_band 403 ✅ 2026-06-27 #modul/content
+- [x] Redis kesh (`content_version`) + **ETag/304** + invalidatsiya signali ✅ 2026-06-27 #modul/content
+- [x] **Adversarial security review** (28 agent, 4 lens) → 15 topilma; tuzatildi: MIME content-verify (SVG-XSS), Pillow bomb (`MAX_IMAGE_PIXELS`), file size cap, content throttle ✅ 2026-06-27 → [[99-Resurslar/Qaror-Jurnali#ADR-011 — Faza 3 xavfsizlik review + public-media xulosasi|ADR-011]]
+- [x] 9 yangi pytest (jami **32** yashil); ffmpeg+Pillow+mutagen image rebuild ✅ 2026-06-27
+
+> [!success] Faza 3 qabul mezonlari bajarildi
+> Media MinIO'ga yuklanadi+ishlanadi (anonim public GET 200, LIST/PUT/DELETE→403); curriculum age_band
+> daraxti; lesson to'liq resolve (media URL bilan); kesh+ETag. **Public-media qaror XAVFSIZ deb tasdiqlandi**
+> (ADR-011). Keyingi: **Faza 4** (dizayn tizimi + bolalar UI qobig'i) → [[04-Vazifalar/Backlog#🟦 Faza 4|Backlog]].
+
 ## ✅ Faza 2 — Kontent modeli + Django Admin + seed (2026-06-27)
 [[SPEC]] §3, §10 — kurikulum modeli, admin, demo kontent. **Additiv** (accounts buzilmadi). **Bajarildi.**
 
@@ -86,6 +104,6 @@ API health 200, frontend ochiladi, migratsiyalar o'tadi, Celery worker ulanadi. 
 - [x] Yo'l xaritasi va 11 faza rejalashtirildi ✅ 2026-06-26 #modul/loyiha → [[03-Reja/Yol-Xaritasi|🛣️ Yo'l xaritasi]]
 
 ## 📊 Statistika
-- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) = **44**
-- Joriy bosqich: **Faza 2 tugadi** → Faza 3'ga (media pipeline + kontent API) tayyorgarlik
+- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) = **57**
+- Joriy bosqich: **Faza 3 tugadi** → Faza 4'ga (dizayn tizimi + bolalar UI) tayyorgarlik
 - Keyingi: [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[04-Vazifalar/Backlog|📥 Backlog]]
