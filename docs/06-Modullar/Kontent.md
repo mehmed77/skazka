@@ -67,6 +67,15 @@ flowchart TB
 - [x] GameType katalogi 11 mexanika bilan to'la (`schema_json`).
 - [x] `is_cognate_uz`, `stress_index`, `l1_translation_json` ishlaydi.
 
-> [!question] Ochiq savol — `config_json` / `schema_json` strukturasi
-> Faza 5 (o'yin dvigateli) kodga tegmasdan `config_json`+`schema_json`dan renderlay oladimi?
-> Faza 6 SRS dinamik so'zni statik `config_json`ga qanday qo'shadi? → Faza 5 boshida ko'rib chiqiladi.
+## Kontent kontrakti (Faza 2.5 — ✅ ADR-010)
+- `LessonStep.config_json` strukturali: `{ "new_items": [{"type":"word","id":"<uuid>"}], "games": [{"type":"eshit_va_bos","distractors":{"source":"theme","exclude_confusable":true}}, ...] }`.
+- `Word.confusable_with` (M2M, **simmetrik**) — §4.4 semantik interferensiya (demo: кошка↔коза).
+- SRS kontrakti: config = STATIK; due so'zlar runtime sessiya-navbatida → [[SPEC]] §4.4, [[99-Resurslar/Qaror-Jurnali#ADR-010 — Kontent kontrakti (confusable + config_json v2 + SRS)|ADR-010]].
+
+## Ma'lum bo'shliqlar (Known gaps)
+> [!warning] Atayin kechiktirilgan (hujjatlangan)
+> - **`soz_qur` bo'g'in segmentatsiyasi** — «Собери слово» bo'g'in/harf ketma-ketligini talab qiladi;
+>   `Word`da bo'g'in maydoni yo'q. **Faza 7'da** (soz_qur qurilganda): `Word.syllables` maydoni YOKI
+>   dvigatelda algoritmik bo'g'inlash. Hozir hech narsa qilinmagan — faqat hujjatlangan bo'shliq.
+> - **Distractor TANLASH mantig'i** — `exclude_confusable` config'da bor, lekin tanlash logikasi **Faza 5** dvigatelida (model+config tayyor).
+> - **Media public URL / RBAC-proxy** — **Faza 3** media pipeline → [[06-Modullar/Media]].

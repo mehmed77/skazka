@@ -81,6 +81,32 @@ def test_gametype_schema_present():
 
 
 @pytest.mark.django_db
+def test_confusable_symmetric():
+    # §4.4 — confusable bog'lanish simmetrik (A↔B)
+    call_command("seed_content")
+    koshka = Word.objects.get(lemma="кошка")
+    koza = Word.objects.get(lemma="коза")
+    assert koza in koshka.confusable_with.all()
+    assert koshka in koza.confusable_with.all()
+
+
+@pytest.mark.django_db
+def test_config_json_new_shape():
+    call_command("seed_content")
+    lesson = Lesson.objects.filter(theme__key="animals_home").first()
+    practice = LessonStep.objects.get(lesson=lesson, kind="practice")
+    cfg = practice.config_json
+    # new_items — tipli obyektlar
+    assert "new_items" in cfg and "games" in cfg
+    assert all("type" in it and "id" in it for it in cfg["new_items"])
+    assert cfg["new_items"][0]["type"] == "word"
+    # games — obyektlar ro'yxati; eshit_va_bos distractor parametrlari bilan (§4.4)
+    eb = next(g for g in cfg["games"] if g["type"] == "eshit_va_bos")
+    assert eb["distractors"]["source"] == "theme"
+    assert eb["distractors"]["exclude_confusable"] is True
+
+
+@pytest.mark.django_db
 def test_admin_pages_load(client):
     admin = ParentAccount.objects.create_superuser(
         phone="+998900000099", password="Adm1nPass9"

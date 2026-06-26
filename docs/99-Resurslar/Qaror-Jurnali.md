@@ -27,6 +27,7 @@ created: 2026-06-26
 | [[#ADR-007 — Til o'zbekcha (i18n keyin)\|ADR-007]] | Hujjat/UI tili | ✅ qabul qilingan |
 | [[#ADR-008 — Ruscha alohida git repo\|ADR-008]] | Repo ajratish | ✅ qabul qilingan |
 | [[#ADR-009 — Faza 1 xavfsizlik qotirish va kechiktirilgan elementlar\|ADR-009]] | Auth xavfsizligi | ✅ qabul qilingan |
+| [[#ADR-010 — Kontent kontrakti (confusable + config_json v2 + SRS)\|ADR-010]] | Kontent/SRS kontrakti | ✅ qabul qilingan |
 
 ---
 
@@ -84,6 +85,17 @@ created: 2026-06-26
 - **Qaror:** Arzon va Faza 1'ga mos topilmalar **darhol tuzatildi**: (1) PIN brute-force'ga qarshi `enter` throttle (`pin_entry` 5/min → 429); (2) Django parol validatorlari `validate_password` orqali ishga tushirildi (DRF avtomatik chaqirmaydi); (3) prod'da `SECRET_KEY` majburiy (dev default'iga tushmasin); (4) telefon normalizatsiyasi (`+998 90...` ≡ `+99890...`) — dublikat va Faza 2 SMS ziddiyatini oldini oladi; (5) PIN serverda aniq 4-raqam; (6) admin'da ota-ona telefon/email qidiruvi olib tashlandi (PII minimallashtirish); (7) register/profiles throttle.
 - **Kechiktirildi (Faza 2+):** bola-kontekst tokenni API interceptorida ishlatish (Faza 6 — hali `learning` endpoint yo'q); JWT'ni `localStorage` o'rniga httpOnly cookie'da saqlash; refresh'da `active_child_id` claim'ni saqlash; parol tiklash / akkaunt recovery (SPEC bo'yicha keyingi faza); enter'dagi TOCTOU; PIN pattern (0000/1234) rad etish.
 - **Oqibat:** Auth qatlami xavfsizlik-birinchi nuqtada git'ga muhrlandi. Kechiktirilgan elementlar tegishli fazada bajariladi. Qarang [[06-Modullar/Accounts#Xavfsizlik (review)]].
+
+## ADR-010 — Kontent kontrakti (confusable + config_json v2 + SRS)
+- **Holat:** ✅ qabul qilingan (2026-06-27, "Faza 2.5")
+- **Kontekst:** Faza 2 kontent katalogi tahlilida 3 bo'shliq aniqlandi: (1) §4.4 semantik interferensiya (o'xshash so'z chalg'ituvchi bo'lmasin) modelda ifodalab bo'lmasdi; (2) `config_json` yassi (`{items, game_types}`) — so'z↔o'yin bog'lanishi va distractor manbai yo'q; (3) SRS dinamik so'zni statik config'ga qanday qo'shishi hujjatsiz edi. Bu — Faza 3 (API) dan **oldin** mustahkamlanishi kerak bo'lgan kontrakt (chunki API shu shaklni qaytaradi).
+- **Qaror:**
+  1. **`Word.confusable_with`** = `M2M('self', symmetrical=True)` — o'xshash so'zlar (demo: кошка↔коза). *Faqat ma'lumot; distractor TANLASH logikasi Faza 5'da.*
+  2. **`config_json` v2:** `{new_items:[{type,id}], games:[{type,...params}]}` — tipli items (word|letter aralash bo'lishi mumkin), per-game parametr (`distractors.source`, `exclude_confusable`, `pair_mode`). `schema_json` deklarativ tavsif sifatida qoladi (validatsiya qo'shilmadi — hozir ortiqcha). `option_count` dvigatel tomonidan `schema_json` diapazonidan tanlanadi, config'da qotirilmaydi.
+  3. **SRS kontrakti hujjatlandi** (SPEC §4.4, CLAUDE.md): `config = statik seed kontenti`; SRS due so'zlar runtime sessiya-navbati qatlamida `interleave` qilinadi, config'ga yozilmaydi.
+  4. **`soz_qur` bo'g'in** bo'shlig'i Faza 7'ga hujjatlandi (kod yo'q) → [[06-Modullar/Kontent#Ma'lum bo'shliqlar (Known gaps)]].
+- **Chegara:** Dvigatel/API/distractor-logikasi/bo'g'in YO'Q — faqat model + config shakli + hujjat. Migratsiya additiv (`content.0002`). 23 pytest yashil.
+- **Oqibat:** Faza 3 API barqaror kontent kontraktiga tayanadi; Faza 5/6 (dvigatel, SRS) kengaytirilgan strukturaga tayyor. Qarang [[06-Modullar/Kontent]], [[06-Modullar/SRS-Learning]].
 
 ---
 

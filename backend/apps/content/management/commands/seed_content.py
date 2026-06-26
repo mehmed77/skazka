@@ -210,6 +210,15 @@ class Command(BaseCommand):
             ["eshit_va_bos", "juftla"],
         )
 
+        # §4.4 demo: o'xshash (confusable) juft — кошка ↔ коза ("ко" boshlanishi, 2 bo'g'in,
+        # ayol jinsi). Faza 5 dvigateli bularni chalg'ituvchi qilmaydi / yonma-yon qo'ymaydi.
+        try:
+            koshka = Word.objects.get(language=ru, lemma="кошка")
+            koza = Word.objects.get(language=ru, lemma="коза")
+            koshka.confusable_with.add(koza)  # symmetrical → ikki tomon ham
+        except Word.DoesNotExist:
+            pass
+
         counts = {
             "languages": Language.objects.count(),
             "letters": Letter.objects.count(),
@@ -254,7 +263,21 @@ class Command(BaseCommand):
             )
             words.append(word)
 
-        word_ids = [str(w.id) for w in words]
+        # Yangi struktura: new_items (tipli) + games (obyektlar). Dvigatel option_count'ni
+        # schema_json diapazonidan (age_band bo'yicha) tanlaydi — config'da QOTIRILMAYDI.
+        new_items = [{"type": "word", "id": str(w.id)} for w in words]
+
+        def games(keys):
+            built = []
+            for k in keys:
+                g = {"type": k}
+                if k == "eshit_va_bos":
+                    g["distractors"] = {"source": "theme", "exclude_confusable": True}
+                elif k == "juftla":
+                    g["pair_mode"] = "image-audio"
+                built.append(g)
+            return built
+
         lesson, _ = Lesson.objects.get_or_create(
             theme=theme,
             order=1,
@@ -265,12 +288,21 @@ class Command(BaseCommand):
             },
         )
         steps = [
-            (1, StepKind.INTRO, {"items": word_ids, "game_types": [game_keys[0]]}),
-            (2, StepKind.PRACTICE, {"items": word_ids, "game_types": game_keys}),
-            (3, StepKind.MASTERY, {"items": word_ids, "game_types": [game_keys[0]]}),
+            (
+                1,
+                StepKind.INTRO,
+                {"new_items": new_items, "games": games([game_keys[0]])},
+            ),
+            (2, StepKind.PRACTICE, {"new_items": new_items, "games": games(game_keys)}),
+            (
+                3,
+                StepKind.MASTERY,
+                {"new_items": new_items, "games": games([game_keys[0]])},
+            ),
         ]
+        # update_or_create — config_json shakli o'zgarsa mavjud qadamlar ham yangilanadi (idempotent)
         for step_order, kind, cfg in steps:
-            LessonStep.objects.get_or_create(
+            LessonStep.objects.update_or_create(
                 lesson=lesson,
                 order=step_order,
                 defaults={"kind": kind, "config_json": cfg},

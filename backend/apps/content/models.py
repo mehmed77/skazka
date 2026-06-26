@@ -188,6 +188,11 @@ class Word(BaseModel):
     plural_form = models.CharField("ko'plik", max_length=64, blank=True)
     freq_rank = models.PositiveIntegerField("chastota o'rni", null=True, blank=True)
     is_cognate_uz = models.BooleanField("o'zbekcha kognat", default=False)
+    # §4.4 semantik interferensiya: o'xshash (tovush/shakl) so'zlar. Faza 5 dvigateli
+    # bularni chalg'ituvchi (distractor) sifatida ishlatmaydi / yonma-yon qo'ymaydi.
+    confusable_with = models.ManyToManyField(
+        "self", symmetrical=True, blank=True, verbose_name="chalkashtiruvchi (o'xshash)"
+    )
 
     class Meta(BaseModel.Meta):
         verbose_name = "So'z"

@@ -155,6 +155,15 @@ Bola darsni/o'yinni boshlaganda:
   → har javob → LearningEvent yoziladi → SRS yangilanadi
 ```
 
+> **Kontent kontrakti (Faza 2.5 qarori — ADR-010):**
+> - `LessonStep.config_json.new_items` = darsning **STATIK** yangi kontenti (seed'da qotgan, o'zgarmas).
+> - SRS "muddati kelgan" so'zlar `config_json`'ga **YOZILMAYDI** — ular runtime'da,
+>   **sessiya-navbati qatlamida** qo'shiladi:
+>   `get_session_queue(child, step) = interleave(SRS.get_due(child), resolve(step.new_items))`
+> - Distractor (chalg'ituvchi) tanlashda `Word.confusable_with` **chiqarib tashlanadi**
+>   (`config_json.games[].distractors.exclude_confusable=true`) — semantik interferensiyani oldini olish.
+> - Ya'ni: **config = o'zgarmas seed kontenti; sessiya-navbati = dinamik qatlam** (Faza 6).
+
 ### 4.5. Har o'zaro ta'sirdan yoziladigan ma'lumot (`LearningEvent`)
 `child_id, item_type (word/letter), item_id, game_type, is_correct, latency_ms, hint_used, session_id, timestamp` — bu ham SRSni boshqaradi, ham analitika beradi.
 

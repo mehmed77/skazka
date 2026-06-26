@@ -46,7 +46,8 @@ Portlar: nginx **8080**, postgres **5433** (override: 5434), minio **9000/9001**
 - **Walled garden:** reklama/chat/tashqi havola yo'q; bolaga alohida login yo'q (ota-ona ichida). PII minimal (§8).
 - **Ko'rinmas SRS** — retrieval o'yin ichida (§4); platformaning yadrosi.
 - **Konvensiyani o'ylab topma** — Maqola'dan aniqla va amal qil; noaniq bo'lsa SPEC'ga qara yoki so'ra.
-- **Custom User:** skeleton'da standart Django User; Faza 1'da `accounts.ParentAccount` + `AUTH_USER_MODEL` toza DB ustida (`docker compose down -v`).
+- **Custom User (✅ Faza 1):** `accounts.ParentAccount` (telefon/email + parol) = `AUTH_USER_MODEL`; bolada login yo'q.
+- **Kontent kontrakti (✅ Faza 2.5 — ADR-010):** `LessonStep.config_json` = `{new_items:[{type,id}], games:[{type,...params}]}` — darsning **STATIK** yangi kontenti. SRS "muddati kelgan" so'zlar config'ga **YOZILMAYDI**; runtime sessiya-navbati qatlamida qo'shiladi: `interleave(SRS.get_due(child), step.new_items)`. Distractor tanlashda `Word.confusable_with` chiqariladi (`exclude_confusable`). Batafsil: `docs/SPEC.md` §4.4.
 
 ## Sifat
 - Backend: `make lint` (ruff+black), `make test` (pytest). Frontend: `npm run typecheck`, `npm run build`, `npm run lint`.
