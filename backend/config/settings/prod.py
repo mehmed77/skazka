@@ -6,6 +6,9 @@ from .base import env
 DEBUG = False
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
 
+# Prod'da SECRET_KEY MAJBURIY (dev default'iga tushib qolmasin — JWT xavfsizligi shunga bog'liq)
+SECRET_KEY = env("DJANGO_SECRET_KEY")
+
 # Reverse-proxy (edge nginx) HTTPS'ni terminate qiladi → domenlarga ishonamiz
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 

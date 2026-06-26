@@ -43,3 +43,6 @@ Thumbs.db
 # ── Obsidian (vault config is local) ─────────────
 docs/.obsidian/workspace*.json
 docs/.trash/
+
+# TypeScript incremental build cache
+*.tsbuildinfo

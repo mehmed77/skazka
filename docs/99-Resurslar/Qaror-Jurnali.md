@@ -26,6 +26,7 @@ created: 2026-06-26
 | [[#ADR-006 — Skeleton standart User → Faza 1 custom\|ADR-006]] | Auth model | ✅ qabul qilingan |
 | [[#ADR-007 — Til o'zbekcha (i18n keyin)\|ADR-007]] | Hujjat/UI tili | ✅ qabul qilingan |
 | [[#ADR-008 — Ruscha alohida git repo\|ADR-008]] | Repo ajratish | ✅ qabul qilingan |
+| [[#ADR-009 — Faza 1 xavfsizlik qotirish va kechiktirilgan elementlar\|ADR-009]] | Auth xavfsizligi | ✅ qabul qilingan |
 
 ---
 
@@ -76,6 +77,13 @@ created: 2026-06-26
 - **Kontekst:** Bu loyiha (ruscha/SKAZKA) `online-judge` repozitoriyasi ichida boshlangan edi, ammo butunlay boshqa mahsulot.
 - **Qaror:** SKAZKA **alohida git repozitoriya** sifatida `online-judge`'dan ajratiladi — mustaqil tarix, CI, deploy.
 - **Oqibat:** Toza chegara, mustaqil versiyalash. ➖ Umumiy yordamchi kodni ikki repo o'rtasida ulashish bo'lsa, alohida paketga chiqarish kerak bo'lishi mumkin. Qarang [[05-DevOps/CI-CD]].
+
+## ADR-009 — Faza 1 xavfsizlik qotirish va kechiktirilgan elementlar
+- **Holat:** ✅ qabul qilingan (2026-06-27)
+- **Kontekst:** Faza 1 auth tugagach, ko'p agentli **adversarial security review** (5 lens: izolyatsiya, token, PIN, maxfiylik, konfiguratsiya) o'tkazildi — 16 ta asoslangan topilma (26 false-positive rad etildi). Bolalar platformasi (COPPA/GDPR-K) uchun auth qatlami xavfsiz bo'lishi shart.
+- **Qaror:** Arzon va Faza 1'ga mos topilmalar **darhol tuzatildi**: (1) PIN brute-force'ga qarshi `enter` throttle (`pin_entry` 5/min → 429); (2) Django parol validatorlari `validate_password` orqali ishga tushirildi (DRF avtomatik chaqirmaydi); (3) prod'da `SECRET_KEY` majburiy (dev default'iga tushmasin); (4) telefon normalizatsiyasi (`+998 90...` ≡ `+99890...`) — dublikat va Faza 2 SMS ziddiyatini oldini oladi; (5) PIN serverda aniq 4-raqam; (6) admin'da ota-ona telefon/email qidiruvi olib tashlandi (PII minimallashtirish); (7) register/profiles throttle.
+- **Kechiktirildi (Faza 2+):** bola-kontekst tokenni API interceptorida ishlatish (Faza 6 — hali `learning` endpoint yo'q); JWT'ni `localStorage` o'rniga httpOnly cookie'da saqlash; refresh'da `active_child_id` claim'ni saqlash; parol tiklash / akkaunt recovery (SPEC bo'yicha keyingi faza); enter'dagi TOCTOU; PIN pattern (0000/1234) rad etish.
+- **Oqibat:** Auth qatlami xavfsizlik-birinchi nuqtada git'ga muhrlandi. Kechiktirilgan elementlar tegishli fazada bajariladi. Qarang [[06-Modullar/Accounts#Xavfsizlik (review)]].
 
 ---
 

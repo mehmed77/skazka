@@ -2,7 +2,7 @@
 title: Accounts moduli
 type: modul
 tags: [modul/accounts, loyiha, prioritet/high]
-status: rejada
+status: bajarildi
 faza: Faza 1
 created: 2026-06-26
 ---
@@ -13,11 +13,11 @@ created: 2026-06-26
 
 SPEC §8 bo'yicha autentifikatsiya yadrosi: **bitta ota-ona akkaunti → bir nechta bola profili**. Bolaga alohida login/email YO'Q — u faqat ota-ona sessiyasi ichida yashaydi.
 
-> [!warning] Skeleton holati (Faza 0)
-> Hozir `accounts` app **modelsiz skeleton** va Django standart `User`'i ishlatiladi.
-> Faza 1'da **toza DB ustida** custom `AUTH_USER_MODEL = accounts.ParentAccount`
-> joriy etiladi. Bu yagona "katta" migratsiya — Faza 0 demosida hech qanday foydalanuvchi
-> ma'lumoti saqlanmagani uchun migratsiya muammosiz amalga oshadi.
+> [!success] Bajarildi (Faza 1 — 2026-06-27)
+> Custom `AUTH_USER_MODEL = accounts.ParentAccount` **toza DB ustida** joriy etildi
+> (`accounts.0001_initial` + `token_blacklist` migratsiyalari o'tdi). Backend 16 pytest,
+> frontend 2 Playwright (happy path), adversarial security review o'tdi. Tafsilot:
+> [[04-Vazifalar/Bajarilgan#✅ Faza 1 — Auth + ota-ona akkaunti + bola profillari (2026-06-27)|Bajarilgan]].
 
 ## Modellar (SPEC §10)
 
@@ -47,18 +47,28 @@ flowchart LR
 - **Parent Gate:** sozlama/xaridga kirishdan oldin kattalar tekshiruvi → [[06-Modullar/Dizayn-Tizimi#Parent Gate]].
 - Bola rejimi: chat/reklama/tashqi havola/ijtimoiy funksiya YO'Q.
 
-## API (DRF, `/api/v1/`)
-- `POST /auth/register`, `POST /auth/login`, `POST /auth/refresh`, `GET /auth/me`
-- `GET/POST/PATCH/DELETE /children/` — profil CRUD (faqat egasi)
-- `POST /children/{id}/enter/` — child-context token (PIN bilan, agar bor)
+## API (DRF, `/api/v1/`) — joriy etilgan
+- `POST /auth/register`, `POST /auth/login` (telefon **yoki** email), `POST /auth/refresh`, `POST /auth/logout` (blacklist), `GET /auth/me`
+- `GET/POST/PATCH/DELETE /profiles/` — profil CRUD (faqat egasi, object-level)
+- `POST /profiles/{id}/enter/` — bola-kontekst token (`parent_id`+`active_child_id`), PIN bilan (agar bor)
 
 ## Ruxsatlar
-- Ota-ona faqat o'z bola profillarini ko'radi/tahrir qiladi → [[02-Arxitektura/Xavfsizlik#Ruxsatlar matritsasi]].
-- Child-context token faqat o'qish + `learning/event` yozishga ruxsat beradi.
+- Ota-ona faqat o'z bola profillarini ko'radi/tahrir qiladi (`get_queryset(parent=user)`; begona → 404) → [[02-Arxitektura/Xavfsizlik#Ruxsatlar matritsasi]].
+- Bola-kontekst token Faza 6'da `learning/*` endpointlarida ishlatiladi (hozir saqlanadi, ulanmagan — [[#Xavfsizlik (review)]]).
 
-## Acceptance
-- [ ] Custom `AUTH_USER_MODEL` toza DB'da joriy etildi (migratsiya o'tadi).
-- [ ] Ota-ona ro'yxatdan o'tadi/kiradi, JWT oladi.
-- [ ] 2+ bola profili yaratiladi va profillar orasida almashish ishlaydi.
-- [ ] Parent Gate'siz sozlamaga kirib bo'lmaydi.
-- [ ] Bolaga alohida login mavjud emas (faqat child-context).
+## Xavfsizlik (review)
+> [!info] Faza 1 xavfsizlik qotirish (adversarial review natijasi)
+> **Tuzatildi:** PIN brute-force throttle (`pin_entry` 5/min → 429), Django parol validatorlari
+> (`validate_password`), prod `SECRET_KEY` majburiy, telefon normalizatsiyasi (dublikat oldini olish),
+> PIN serverda aniq 4-raqam, admin'da ota-ona PII (telefon/email) qidiruvdan olib tashlandi, register/profiles throttle.
+> **Faza 2+ ga kechiktirildi:** bola-kontekst tokenni API'da ishlatish (Faza 6), httpOnly cookie, refresh'da
+> child-context saqlash, parol tiklash/akkaunt recovery. Batafsil → [[99-Resurslar/Qaror-Jurnali#ADR-009 — Faza 1 xavfsizlik qotirish va kechiktirilgan elementlar|ADR-009]].
+
+## Acceptance ✅
+- [x] Custom `AUTH_USER_MODEL` toza DB'da joriy etildi (migratsiya o'tdi).
+- [x] Ota-ona ro'yxatdan o'tadi/kiradi/refresh/me, JWT oladi.
+- [x] 2+ bola profili yaratiladi va profilga kirish (bola-kontekst token) ishlaydi.
+- [x] Begona ota-ona kirishi rad etiladi (object-level, 404).
+- [x] Parent Gate'siz sozlamaga kirib bo'lmaydi.
+- [x] Bolaga alohida login mavjud emas (faqat child-context).
+- [x] next-intl: UI o'zbekcha, rusga almashtirsa bo'ladi.

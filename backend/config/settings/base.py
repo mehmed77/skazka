@@ -36,6 +36,7 @@ THIRD_PARTY_APPS = [
     "drf_spectacular",
     "corsheaders",
     "django_celery_beat",
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 # SKAZKA bounded-context'lari (SPEC §9.2). Hozircha skeleton — modellar keyingi fazalarda.
@@ -95,10 +96,9 @@ DATABASES = {
 }
 
 # ── Auth ─────────────────────────────────────────
-# Eslatma: skeleton'da Django'ning standart User modeli ishlatiladi.
-# Faza 1'da `accounts.ParentAccount` (email-asosli ota-ona akkaunti) joriy qilinadi —
-# AUTH_USER_MODEL'ni o'sha fazada, TOZA DB ustida belgilang (`docker compose down -v`),
-# chunki migratsiyadan keyin user modelini almashtirish og'riqli. Batafsil: docs/06-Modullar/Accounts.md
+# Ota-ona akkaunti = custom user (telefon/email + parol). Bolada login YO'Q (SPEC §8).
+AUTH_USER_MODEL = "accounts.ParentAccount"
+
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
@@ -140,6 +140,9 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": ("rest_framework.throttling.ScopedRateThrottle",),
     "DEFAULT_THROTTLE_RATES": {
         "login": "10/min",
+        "register": "30/hour",
+        "profiles": "120/hour",
+        "pin_entry": "5/min",  # PIN brute-force himoyasi (enter)
     },
 }
 
@@ -147,7 +150,7 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
-    "BLACKLIST_AFTER_ROTATION": False,
+    "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 

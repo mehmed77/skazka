@@ -1,0 +1,55 @@
+{
+  "common": {
+    "appName": "SKAZKA",
+    "start": "Boshlash",
+    "loading": "Yuklanmoqda...",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "back": "Orqaga"
+  },
+  "auth": {
+    "loginTitle": "Kirish",
+    "registerTitle": "Ro'yxatdan o'tish",
+    "loginField": "Telefon yoki email",
+    "phone": "Telefon",
+    "email": "Email",
+    "password": "Parol",
+    "fullName": "Ismingiz",
+    "loginBtn": "Kirish",
+    "registerBtn": "Ro'yxatdan o'tish",
+    "noAccount": "Akkauntingiz yo'qmi? Ro'yxatdan o'ting",
+    "haveAccount": "Akkauntingiz bormi? Kiring",
+    "logout": "Chiqish",
+    "error": "Telefon/email yoki parol noto'g'ri",
+    "registerError": "Ro'yxatdan o'tishda xatolik"
+  },
+  "profiles": {
+    "title": "Kim o'ynaydi?",
+    "greeting": "Salom! Kim o'ynaydi?",
+    "add": "Yangi profil",
+    "name": "Ism",
+    "ageBand": "Yosh",
+    "avatar": "Avatar",
+    "pinOptional": "PIN (ixtiyoriy, 4 raqam)",
+    "create": "Yaratish",
+    "enterPin": "PIN kiriting",
+    "wrongPin": "PIN noto'g'ri",
+    "empty": "Hali profil yo'q. Birinchisini qo'shing."
+  },
+  "gate": {
+    "title": "Kattalar zonasi",
+    "subtitle": "Davom etish uchun misolni yeching",
+    "answer": "Javob",
+    "confirm": "Tasdiqlash",
+    "wrong": "Noto'g'ri — qayta urinib ko'ring"
+  },
+  "play": {
+    "hi": "Salom, {name}! 🐻",
+    "soon": "O'yinlar Faza 4'da tayyor bo'ladi",
+    "exit": "Chiqish"
+  },
+  "nav": {
+    "profiles": "Profillar",
+    "settings": "Sozlamalar"
+  }
+}

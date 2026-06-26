@@ -13,21 +13,20 @@ created: 2026-06-26
 > bu yerga ko'chiriladi, tugaganda `[x]` qilinib [[04-Vazifalar/Bajarilgan|Bajarilgan]]'ga o'tadi.
 
 > [!info] Hozirgi holat
-> **Faza 0 (Skeleton va Docker) yakunlandi** — barcha natijalar [[04-Vazifalar/Bajarilgan#✅ Faza 0 — Skeleton (2026-06-26)|Bajarilgan]]'da.
-> Hozir taxta **bo'sh**: ✅ Faza 1'ga tayyorgarlik bosqichi.
+> **Faza 0 (Skeleton)** va **Faza 1 (Auth + ota-ona + bola profillari)** yakunlandi —
+> natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da. Hozir taxta **bo'sh**: Faza 2'ga tayyorgarlik.
 
-## 🟡 Faza 1 ga tayyorgarlik
-Faza 1 ([[SPEC]] §12) — Auth + ota-ona akkaunti + bola profillari. Boshlashdan oldin:
+## 🟡 Faza 2 ga tayyorgarlik
+Faza 2 ([[SPEC]] §3, §10) — Kontent modeli + Django Admin + seed. Boshlashdan oldin:
 
-- [ ] Toza DB rejasi: custom `AUTH_USER_MODEL` ni qachon kiritish (migratsiyalar tartibi) #modul/accounts → [[06-Modullar/Accounts|👤 Accounts]]
-- [ ] `ParentAccount` / `ChildProfile` maydonlarini [[02-Arxitektura/Malumotlar-Bazasi|🗄️ baza]] bilan moslashtirish #modul/accounts
-- [ ] Parent Gate UX qarori (uzoq bosish vs matematik misol) — [[06-Modullar/Dizayn-Tizimi|🎨 dizayn]] bilan #modul/frontend
+- [ ] Kontent ierarxiyasini aniqlash: Language→Level→Theme→Lesson→LessonStep #modul/kontent → [[06-Modullar/Kontent|📚 Kontent]]
+- [ ] Trek A (Letter) + Trek B (Word) maydonlarini [[02-Arxitektura/Malumotlar-Bazasi|🗄️ baza]] bilan moslashtirish #modul/kontent
+- [ ] `GameType` katalogi sxemasi (§5 — 11 mexanika) #modul/kontent → [[06-Modullar/Oyin-Mexanikalari|🎮 O'yinlar]]
 
 > [!tip] Pull nomzodlari (WIP ≤ 3)
-> Tayyorgarlik tugagach, [[04-Vazifalar/Backlog#🟦 Faza 1 — Auth + ota-ona akkaunti + bola profillari|Backlog Faza 1]]'dan birinchi tortiladigan vazifalar:
-> 1. Custom `AUTH_USER_MODEL` ga o'tish (toza DB ustida) `#prioritet/high`
-> 2. `ParentAccount` modeli + JWT (register/login/refresh/me) `#prioritet/high`
-> 3. `ChildProfile` modeli + "profilga o'tish" child-context token `#prioritet/high`
+> 1. `content` modellari (Language..Song) + migratsiya `#prioritet/high`
+> 2. Django Admin (inline'lar: Lesson↔LessonStep, Theme↔Lesson) + media maydonlari `#prioritet/high`
+> 3. `seed_demo` — ru Level 1, 1-harf guruhi, 2 mavzu, GameType katalogi `#prioritet/high`
 
 ## ⛔ Bloklangan (Blocked)
 _(Yo'q)_

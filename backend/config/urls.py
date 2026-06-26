@@ -1,9 +1,12 @@
-"""SKAZKA — asosiy URL marshrutlari (skeleton)."""
+"""SKAZKA — asosiy URL marshrutlari."""
 
 from django.contrib import admin
 from django.http import JsonResponse
-from django.urls import path
+from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from rest_framework.routers import DefaultRouter
+
+from apps.accounts.views import ChildProfileViewSet
 
 
 def health(_request):
@@ -14,7 +17,7 @@ def health(_request):
 def config(_request):
     """Konfiguratsiya-asoslangan brending (SPEC §9.2 `/api/config/`).
 
-    Hozircha statik placeholder; Faza 8'da `billing.BrandingConfig` / institut
+    Hozircha statik placeholder; keyinroq `billing.BrandingConfig` / institut
     bo'yicha dinamik bo'ladi (bir platforma — ko'p brending).
     """
     return JsonResponse(
@@ -30,19 +33,25 @@ def config(_request):
     )
 
 
-# Faza oshgani sari app router/url'lari shu ro'yxatga qo'shiladi.
-api_v1: list = []
+_profiles_router = DefaultRouter()
+_profiles_router.register("profiles", ChildProfileViewSet, basename="profile")
+
+# /api/v1/ ostidagi versiyalangan API
+api_v1 = [
+    path("auth/", include("apps.accounts.urls")),
+    *_profiles_router.urls,
+]
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/health/", health),
     path("api/config/", config),
-    # OpenAPI (drf-spectacular)
+    # OpenAPI (drf-spectacular) — include'dan oldin (aniq yo'l ustun)
     path("api/v1/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/v1/docs/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
-    *api_v1,
+    path("api/v1/", include((api_v1, "api"), namespace="v1")),
 ]

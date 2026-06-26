@@ -11,6 +11,26 @@ created: 2026-06-26
 > Bog'liq: [[04-Vazifalar/Backlog|📥 Backlog]] · [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[03-Reja/Bosqichlar#Faza 0|🪜 Faza 0]]
 > Tugagan vazifalar shu yerga sana bilan ko'chiriladi (eng yangisi tepada).
 
+## ✅ Faza 1 — Auth + ota-ona akkaunti + bola profillari (2026-06-27)
+[[SPEC]] §8, §2.8 — autentifikatsiya, ota-ona akkaunti, bola profillari. **Bajarildi, sinovdan o'tdi, xavfsizlik ko'rib chiqildi.**
+
+- [x] Custom `AUTH_USER_MODEL = accounts.ParentAccount` — **toza DB** ustida, migratsiya OK ✅ 2026-06-27 #modul/accounts → [[06-Modullar/Accounts|🔐 Accounts]]
+- [x] `ParentAccount` (telefon/email + parol, `AbstractBaseUser` + custom manager) ✅ 2026-06-27 #modul/accounts
+- [x] `ChildProfile` (avatar, `age_band`, `l1_locale`, PIN-**hash**, bolaga login yo'q) ✅ 2026-06-27 #modul/accounts
+- [x] JWT: `register` / `login` (telefon **yoki** email) / `refresh` / `logout` (blacklist) / `me` ✅ 2026-06-27 #modul/accounts
+- [x] `/api/v1/profiles/` CRUD — **object-level** (faqat o'z bolalari; begona → 404) ✅ 2026-06-27 #modul/accounts
+- [x] `/profiles/{id}/enter/` — **bola-kontekst token** (`parent_id`+`active_child_id`), PIN tekshiruvi ✅ 2026-06-27 #modul/accounts
+- [x] `next-intl` (uz/ru) + ota-ona auth ekranlari + profil tanlash (avatar kartochka, `useAudio` salom) ✅ 2026-06-27 #modul/frontend
+- [x] PIN-pad + **Parent Gate** (§7.4, matematik) + Guard ✅ 2026-06-27 #modul/frontend → [[06-Modullar/Dizayn-Tizimi|🎨 Dizayn]]
+- [x] **16 pytest** + **2 Playwright** (happy path) yashil; Swagger 8 endpoint ✅ 2026-06-27
+- [x] Adversarial security review (49 agent, 5 lens) → 16 topilma; arzonlari **tuzatildi va live tasdiqlandi** ✅ 2026-06-27 → [[99-Resurslar/Qaror-Jurnali#ADR-009 — Faza 1 xavfsizlik qotirish va kechiktirilgan elementlar|ADR-009]]
+  - PIN brute-force throttle (5/min → **429**), Django parol validatorlari, prod `SECRET_KEY` majburiy, telefon normalizatsiyasi, PIN aniq 4-raqam, admin'da ota-ona PII kamaytirildi
+
+> [!success] Faza 1 qabul mezonlari bajarildi
+> Ota-ona ro'yxat/kirish/refresh/me, 2+ bola profili, profilga kirish, object-level izolyatsiya,
+> Parent Gate, uz↔ru — hammasi ishlaydi va testlangan. Keyingi: **Faza 2** (kontent modeli + Django Admin + seed) →
+> [[04-Vazifalar/Backlog#🟦 Faza 2|Backlog Faza 2]].
+
 ## ✅ Faza 0 — Skeleton (2026-06-26)
 [[SPEC]] §12 Faza 0 — "Repo + Docker skeleton". Qabul mezoni: `docker compose up` →
 API health 200, frontend ochiladi, migratsiyalar o'tadi, Celery worker ulanadi. **Bajarildi.**
@@ -47,6 +67,6 @@ API health 200, frontend ochiladi, migratsiyalar o'tadi, Celery worker ulanadi. 
 - [x] Yo'l xaritasi va 11 faza rejalashtirildi ✅ 2026-06-26 #modul/loyiha → [[03-Reja/Yol-Xaritasi|🛣️ Yo'l xaritasi]]
 
 ## 📊 Statistika
-- Bajarilgan: rejalashtirish (**5**) + Faza 0 skeleton (**19**) = **24**
-- Joriy bosqich: **Faza 0 tugadi** → Faza 1'ga tayyorgarlik
+- Bajarilgan: rejalashtirish (**5**) + Faza 0 skeleton (**19**) + Faza 1 auth (**10**) = **34**
+- Joriy bosqich: **Faza 1 tugadi** → Faza 2'ga (kontent modeli) tayyorgarlik
 - Keyingi: [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[04-Vazifalar/Backlog|📥 Backlog]]

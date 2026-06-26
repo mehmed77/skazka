@@ -1,14 +1,28 @@
 "use client";
 
-import { Button } from "@/components/ui";
-import { toast } from "@/lib/toast";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 
-// SKAZKA boshlang'ich (welcome) ekrani — skeleton.
-// Bola o'qiy olmaydi → audio-birinchi, ulkan nishonlar, matn minimal (§7).
-// Haqiqiy bolalar qobig'i (Mishka, sayohat xaritasi, ovoz) Faza 4'da quriladi.
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { Button } from "@/components/ui";
+import { tokenStore } from "@/lib/api";
+
+// SKAZKA boshlang'ich (welcome). Kirgan ota-ona bo'lsa → profillar.
 export default function Home() {
+  const t = useTranslations("common");
+  const router = useRouter();
+
+  useEffect(() => {
+    if (tokenStore.access) router.replace("/profiles");
+  }, [router]);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-gradient-to-b from-brand-50 to-background px-6 text-center">
+    <main className="relative flex min-h-screen flex-col items-center justify-center gap-8 bg-gradient-to-b from-brand-50 to-background px-6 text-center">
+      <div className="absolute right-4 top-4">
+        <LanguageToggle />
+      </div>
+
       <div className="animate-bounce-soft text-8xl" role="img" aria-label="Mishka ayiqcha">
         🐻
       </div>
@@ -20,16 +34,9 @@ export default function Home() {
         </p>
       </div>
 
-      <Button
-        size="lg"
-        onClick={() => toast.success("Mishka tayyor! 🎉 (skeleton — o'yin Faza 4'da)")}
-      >
-        Boshlash
+      <Button size="lg" onClick={() => router.push("/login")}>
+        {t("start")}
       </Button>
-
-      <footer className="absolute bottom-6 text-sm text-muted-foreground">
-        Faza 0 — skeleton · Next.js + PWA · <span className="font-mono">/api/health</span>
-      </footer>
     </main>
   );
 }
