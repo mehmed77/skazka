@@ -1,0 +1,277 @@
+"""Demo kurikulum seed'i (SPEC §3) — IDEMPOTENT (get_or_create, dublikat yo'q).
+
+Yaratadi: ru+uz tillar, Level 1, 1-harf guruhi (А,О,К,М,Т,С,Н,И), GameType katalogi
+(11 mexanika), 2 mavzu (Hayvonlar uy / Ranglar) so'zlari bilan, har mavzuda 1 ta dars
+(intro→practice→mastery). Media biriktirilmaydi (real jonli ovoz/rasm — alohida vazifa).
+"""
+
+from django.core.management.base import BaseCommand
+from django.db import transaction
+
+from apps.content.models import (
+    GameType,
+    Language,
+    Lesson,
+    LessonStep,
+    Letter,
+    Level,
+    StepKind,
+    Theme,
+    Word,
+)
+
+# (lemma, translit, stress_index, uz, gender, plural, freq_rank, is_cognate_uz)
+ANIMALS = [
+    ("кошка", "koshka", 1, "mushuk", "f", "кошки", 1, False),
+    ("собака", "sobaka", 3, "it", "f", "собаки", 2, False),
+    ("корова", "korova", 3, "sigir", "f", "коровы", 3, False),
+    ("лошадь", "loshad", 1, "ot", "f", "лошади", 4, False),
+    ("коза", "koza", 3, "echki", "f", "козы", 5, False),
+    ("свинья", "svinya", 5, "cho'chqa", "f", "свиньи", 6, False),
+]
+COLORS = [
+    ("красный", "krasniy", 2, "qizil", "-", "красные", 1, False),
+    ("синий", "siniy", 1, "ko'k", "-", "синие", 2, False),
+    ("зелёный", "zelyoniy", 3, "yashil", "-", "зелёные", 3, False),
+    ("жёлтый", "jyoltiy", 1, "sariq", "-", "жёлтые", 4, False),
+    ("белый", "beliy", 1, "oq", "-", "белые", 5, False),
+    ("чёрный", "chyorniy", 1, "qora", "-", "чёрные", 6, False),
+]
+# (char, sound_ipa, mnemonic) — 1-guruh (§3: tanish ko'rinish/tovush)
+LETTERS = [
+    ("А", "a", "Aist (laylak) — 'А'"),
+    ("О", "o", "Olma — dumaloq 'О'"),
+    ("К", "k", "Kot (mushuk) — 'К'"),
+    ("М", "m", "Mama (ona) — 'М'"),
+    ("Т", "t", "Tigr (yo'lbars) — 'Т'"),
+    ("С", "s", "Sok (sharbat) — 'С'"),
+    ("Н", "n", "Nos (burun) — 'Н'"),
+    ("И", "i", "Igla (igna) — 'И'"),
+]
+# (key, uz, ru, skill, min_age, schema_json) — §5 jadvalidagi 11 mexanika
+GAME_TYPES = [
+    (
+        "eshit_va_bos",
+        "Eshit va bos",
+        "Слушай и нажми",
+        "word_recognition",
+        "3-4",
+        {
+            "prompt": "audio",
+            "options": "image",
+            "option_count": [2, 4],
+            "answer": "single",
+        },
+    ),
+    (
+        "juftla",
+        "Juftla",
+        "Найди пару",
+        "memory",
+        "3-4",
+        {"pairs": "image-audio|image-image", "grid": [4, 6]},
+    ),
+    (
+        "topib_ber",
+        "Topib ber",
+        "Покажи…",
+        "tpr",
+        "3-4",
+        {"scene": "objects", "prompt": "audio", "answer": "tap_object"},
+    ),
+    (
+        "harf_ovi",
+        "Harf ovi",
+        "Где буква?",
+        "letter_recognition",
+        "5-6",
+        {"target": "letter", "field": "letters_or_word"},
+    ),
+    (
+        "harf_chiz",
+        "Harf chiz",
+        "Обведи букву",
+        "tracing",
+        "5-6",
+        {"trace": "letter_path", "guide": True},
+    ),
+    (
+        "qaysi_tovush",
+        "Qaysi tovush?",
+        "Какой звук?",
+        "phonics",
+        "5-6",
+        {"prompt": "audio_sound", "options": "letters"},
+    ),
+    (
+        "soz_qur",
+        "So'z qur",
+        "Собери слово",
+        "word_building",
+        "6-7",
+        {"build": "syllables_or_letters", "target": "word"},
+    ),
+    (
+        "sehrli_ertak",
+        "Sehrli ertak",
+        "Сказка",
+        "story",
+        "5-6",
+        {"mode": "choose_path", "source": "story"},
+    ),
+    (
+        "qoshiq",
+        "Qo'shiq",
+        "Песенка",
+        "song",
+        "3-4",
+        {"audio": "song", "highlight": "words"},
+    ),
+    (
+        "aytib_ber",
+        "Aytib ber",
+        "Скажи!",
+        "speaking_asr",
+        "5-6",
+        {"prompt": "image", "capture": "speech", "phase": "later"},
+    ),
+    (
+        "takrorlash",
+        "Takrorlash o'yini",
+        "Повторюшка",
+        "mixed_retrieval",
+        "3-4",
+        {"mix": "due_words", "mechanic": "varied"},
+    ),
+]
+
+
+class Command(BaseCommand):
+    help = "Demo kurikulum kontentini yaratadi (idempotent)."
+
+    @transaction.atomic
+    def handle(self, *args, **options):
+        ru, _ = Language.objects.get_or_create(code="ru", defaults={"name": "Rus tili"})
+        Language.objects.get_or_create(code="uz", defaults={"name": "O'zbek tili"})
+
+        level, _ = Level.objects.get_or_create(
+            language=ru,
+            order=1,
+            defaults={"title_uz": "1-daraja", "title_ru": "Уровень 1"},
+        )
+
+        # Harflar (1-guruh)
+        for i, (char, ipa, mnem) in enumerate(LETTERS, start=1):
+            Letter.objects.get_or_create(
+                language=ru,
+                char=char,
+                defaults={
+                    "sound_ipa": ipa,
+                    "mnemonic_text": mnem,
+                    "group_no": 1,
+                    "order": i,
+                },
+            )
+
+        # GameType katalogi
+        for key, uz, ru_name, skill, age, schema in GAME_TYPES:
+            GameType.objects.get_or_create(
+                key=key,
+                defaults={
+                    "name_uz": uz,
+                    "name_ru": ru_name,
+                    "skill": skill,
+                    "min_age_band": age,
+                    "schema_json": schema,
+                },
+            )
+
+        # Mavzular + so'zlar + darslar
+        self._seed_theme(
+            level,
+            1,
+            "animals_home",
+            "Hayvonlar (uy)",
+            "Животные (дом)",
+            "🐾",
+            "noun",
+            ANIMALS,
+            ["eshit_va_bos", "juftla", "topib_ber"],
+        )
+        self._seed_theme(
+            level,
+            2,
+            "colors",
+            "Ranglar",
+            "Цвета",
+            "🎨",
+            "adj",
+            COLORS,
+            ["eshit_va_bos", "juftla"],
+        )
+
+        counts = {
+            "languages": Language.objects.count(),
+            "letters": Letter.objects.count(),
+            "game_types": GameType.objects.count(),
+            "themes": Theme.objects.count(),
+            "words": Word.objects.count(),
+            "lessons": Lesson.objects.count(),
+            "steps": LessonStep.objects.count(),
+        }
+        self.stdout.write(self.style.SUCCESS(f"[seed_content] tayyor: {counts}"))
+
+    def _seed_theme(
+        self, level, order, key, title_uz, title_ru, icon, pos, rows, game_keys
+    ):
+        ru = level.language
+        theme, _ = Theme.objects.get_or_create(
+            level=level,
+            key=key,
+            defaults={
+                "order": order,
+                "title_uz": title_uz,
+                "title_ru": title_ru,
+                "icon": icon,
+            },
+        )
+        words = []
+        for lemma, translit, stress, uz, gender, plural, freq, cognate in rows:
+            word, _ = Word.objects.get_or_create(
+                language=ru,
+                lemma=lemma,
+                defaults={
+                    "translit": translit,
+                    "stress_index": stress,
+                    "l1_translation_json": {"uz": uz},
+                    "theme": theme,
+                    "part_of_speech": pos,
+                    "gender": gender,
+                    "plural_form": plural,
+                    "freq_rank": freq,
+                    "is_cognate_uz": cognate,
+                },
+            )
+            words.append(word)
+
+        word_ids = [str(w.id) for w in words]
+        lesson, _ = Lesson.objects.get_or_create(
+            theme=theme,
+            order=1,
+            defaults={
+                "title_uz": f"{title_uz} — 1-dars",
+                "title_ru": title_ru,
+                "min_age_band": "3-4",
+            },
+        )
+        steps = [
+            (1, StepKind.INTRO, {"items": word_ids, "game_types": [game_keys[0]]}),
+            (2, StepKind.PRACTICE, {"items": word_ids, "game_types": game_keys}),
+            (3, StepKind.MASTERY, {"items": word_ids, "game_types": [game_keys[0]]}),
+        ]
+        for step_order, kind, cfg in steps:
+            LessonStep.objects.get_or_create(
+                lesson=lesson,
+                order=step_order,
+                defaults={"kind": kind, "config_json": cfg},
+            )

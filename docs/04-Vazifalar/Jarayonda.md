@@ -13,20 +13,20 @@ created: 2026-06-26
 > bu yerga ko'chiriladi, tugaganda `[x]` qilinib [[04-Vazifalar/Bajarilgan|Bajarilgan]]'ga o'tadi.
 
 > [!info] Hozirgi holat
-> **Faza 0 (Skeleton)** va **Faza 1 (Auth + ota-ona + bola profillari)** yakunlandi —
-> natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da. Hozir taxta **bo'sh**: Faza 2'ga tayyorgarlik.
+> **Faza 0, 1, 2** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
+> Hozir taxta **bo'sh**: Faza 3'ga tayyorgarlik.
 
-## 🟡 Faza 2 ga tayyorgarlik
-Faza 2 ([[SPEC]] §3, §10) — Kontent modeli + Django Admin + seed. Boshlashdan oldin:
+## 🟡 Faza 3 ga tayyorgarlik
+Faza 3 ([[SPEC]] §9.2, §7.3) — Media pipeline + kontent API. Boshlashdan oldin:
 
-- [ ] Kontent ierarxiyasini aniqlash: Language→Level→Theme→Lesson→LessonStep #modul/kontent → [[06-Modullar/Kontent|📚 Kontent]]
-- [ ] Trek A (Letter) + Trek B (Word) maydonlarini [[02-Arxitektura/Malumotlar-Bazasi|🗄️ baza]] bilan moslashtirish #modul/kontent
-- [ ] `GameType` katalogi sxemasi (§5 — 11 mexanika) #modul/kontent → [[06-Modullar/Oyin-Mexanikalari|🎮 O'yinlar]]
+- [ ] `config_json`/`schema_json` strukturasini Faza 5/6 nuqtai nazaridan ko'rib chiqish #modul/content → [[06-Modullar/Kontent|📚 Kontent]]
+- [ ] Media public URL (`minio:9000`→`localhost:9000`/CDN) + RBAC download-proxy #modul/media → [[06-Modullar/Media|🎨 Media]]
+- [ ] Kontent API shakli: `GET /api/v1/curriculum/`, `GET /api/v1/lesson/{id}/` (media URL bilan) #modul/content → [[02-Arxitektura/API-Dizayni|🔌 API]]
 
 > [!tip] Pull nomzodlari (WIP ≤ 3)
-> 1. `content` modellari (Language..Song) + migratsiya `#prioritet/high`
-> 2. Django Admin (inline'lar: Lesson↔LessonStep, Theme↔Lesson) + media maydonlari `#prioritet/high`
-> 3. `seed_demo` — ru Level 1, 1-harf guruhi, 2 mavzu, GameType katalogi `#prioritet/high`
+> 1. Media Celery pipeline (audio normalize/transcode, rasm optimize) `#prioritet/high`
+> 2. Kontent API (`/api/v1/curriculum`, `/api/v1/lesson/{id}`) + DRF serializerlar + Redis kesh/ETag `#prioritet/high`
+> 3. Media RBAC download-proxy + public URL `#prioritet/medium`
 
 ## ⛔ Bloklangan (Blocked)
 _(Yo'q)_

@@ -2,7 +2,7 @@
 title: Kontent moduli (kurikulum)
 type: modul
 tags: [modul/content, loyiha, prioritet/high]
-status: rejada
+status: bajarildi
 faza: Faza 2
 created: 2026-06-26
 ---
@@ -50,11 +50,23 @@ flowchart TB
 
 ## Boshqaruv
 - **Django Admin** — inline'lar bilan (Lesson ichida LessonStep, Theme ichida Lesson), Media yuklash maydonlari. MVP uchun yetarli.
-- **`seed_demo`** management command: ru / Level 1, 1-harf guruhi (А,О,К,М,Т,С,Н,И), 2 mavzu (Hayvonlar uy, Ranglar), har mavzuda intro→practice→mastery dars, GameType katalogi (§5 11 mexanika).
+- **`seed_content`** management command (**idempotent** — `get_or_create`): ru+uz, Level 1, 1-harf guruhi (А,О,К,М,Т,С,Н,И), 2 mavzu (Hayvonlar uy, Ranglar), har mavzuda intro→practice→mastery dars, GameType katalogi (§5 — 11 mexanika). `make seed`.
 
-## Acceptance
-- [ ] Barcha kurikulum modellari migratsiya bo'ladi.
-- [ ] Django Admin'da inline'lar bilan kontent kiritiladi/tahrirlanadi.
-- [ ] `seed_demo` demo darslarni (harf guruhi + 2 mavzu) yaratadi.
-- [ ] GameType katalogi 11 mexanika bilan to'la.
-- [ ] `is_cognate_uz` bilan kognat so'zlar belgilanadi.
+> [!success] Bajarildi (Faza 2 — 2026-06-27)
+> `media.0001` + `content.0001` **additiv** migratsiya (accounts buzilmadi). Word'da `stress_index`
+> (urg'u: зáмок≠замóк) + `l1_translation_json` ({"uz":...}, B2B ko'p-L1). GameType — 11 mexanika,
+> `schema_json` bilan. LessonStep `config_json` — data-driven yelim (so'z ID + GameType kalit).
+> Seed: 12 so'z, 8 harf, 11 GameType, 2 dars, 6 qadam. 21 pytest yashil. Media FK'lar **nullable**
+> (real jonli ovoz/rasm — kontent-ishlab chiqarish, Faza 3 media pipeline). Admin login + dizayn
+> (collectstatic) + CSRF (`CSRF_TRUSTED_ORIGINS`) tuzatildi.
+
+## Acceptance ✅
+- [x] Barcha kurikulum modellari additiv migratsiya bo'ladi (accounts saqlanadi).
+- [x] Django Admin'da inline'lar bilan kontent kiritiladi/tahrirlanadi.
+- [x] `seed_content` demo darslarni (harf guruhi + 2 mavzu) yaratadi — **idempotent**.
+- [x] GameType katalogi 11 mexanika bilan to'la (`schema_json`).
+- [x] `is_cognate_uz`, `stress_index`, `l1_translation_json` ishlaydi.
+
+> [!question] Ochiq savol — `config_json` / `schema_json` strukturasi
+> Faza 5 (o'yin dvigateli) kodga tegmasdan `config_json`+`schema_json`dan renderlay oladimi?
+> Faza 6 SRS dinamik so'zni statik `config_json`ga qanday qo'shadi? → Faza 5 boshida ko'rib chiqiladi.

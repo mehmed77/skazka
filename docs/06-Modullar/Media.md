@@ -13,6 +13,12 @@ created: 2026-06-26
 
 SPEC §9.2 / §7.3: barcha audio/rasm/lottie aktivlari S3-mos object storage'da (dev=MinIO, prod=S3+CDN). Audio — **ona tilida so'zlovchi** (native speaker), past kechikishli (Web Audio API).
 
+> [!info] Faza 2'da yaratilgan qism
+> `Media` modeli + admin preview + **MinIO yuklash** Faza 2'da qo'shildi (content FK'lari uchun) va
+> end-to-end tasdiqlandi (fayl bucket'ga saqlanadi/o'qiladi). **Faza 3'da to'liq pipeline:** Celery
+> transcode/optimize, RBAC download-proxy, va brauzer uchun **public URL** (`minio:9000` ichki →
+> `localhost:9000`/CDN; `MINIO_PUBLIC_DOMAIN` ni settings'ga ulash).
+
 ## Model (SPEC §10)
 
 | Model | Maydonlar |

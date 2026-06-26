@@ -11,6 +11,25 @@ created: 2026-06-26
 > Bog'liq: [[04-Vazifalar/Backlog|📥 Backlog]] · [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[03-Reja/Bosqichlar#Faza 0|🪜 Faza 0]]
 > Tugagan vazifalar shu yerga sana bilan ko'chiriladi (eng yangisi tepada).
 
+## ✅ Faza 2 — Kontent modeli + Django Admin + seed (2026-06-27)
+[[SPEC]] §3, §10 — kurikulum modeli, admin, demo kontent. **Additiv** (accounts buzilmadi). **Bajarildi.**
+
+- [x] `media.Media` (kind/file/duration/meta) + MinIO yuklash (end-to-end tasdiqlandi) ✅ 2026-06-27 #modul/media → [[06-Modullar/Media|🎨 Media]]
+- [x] `content` modellari: Language→Level→Theme→Lesson→LessonStep (config_json) ✅ 2026-06-27 #modul/content → [[06-Modullar/Kontent|📚 Kontent]]
+- [x] Trek A `Letter` (char, sound_ipa, group_no) + Trek B `Word` (stress_index, l1_translation_json, gender, freq_rank, is_cognate_uz) ✅ 2026-06-27 #modul/content
+- [x] `Phrase` / `Story`+`StoryNode` / `Song` (TPRS/qo'shiq) ✅ 2026-06-27 #modul/content
+- [x] `GameType` katalogi — **11 mexanika** + `schema_json` (data-driven poydevor) ✅ 2026-06-27 #modul/content → [[06-Modullar/Oyin-Mexanikalari|🎮 O'yinlar]]
+- [x] `media.0001` + `content.0001` **additiv** migratsiya (accounts saqlandi) ✅ 2026-06-27 #modul/backend
+- [x] Django Admin: Theme▸Lesson▸LessonStep inline, Word filtrlari, Media preview ✅ 2026-06-27 #modul/backend
+- [x] `seed_content` (**idempotent** get_or_create): 12 so'z, 8 harf, 11 GameType, 2 dars, 6 qadam ✅ 2026-06-27 #modul/content
+- [x] 5 yangi pytest (jami **21** yashil); `seed_demo`→`seed_content` (Makefile + release.sh) ✅ 2026-06-27
+- [x] Tuzatildi: admin CSS (`collectstatic`), CSRF (`CSRF_TRUSTED_ORIGINS=localhost:8080`) ✅ 2026-06-27 #modul/devops
+
+> [!success] Faza 2 qabul mezonlari bajarildi
+> Admin'da kurikulum daraxti boshqariladi, `make seed` idempotent demo kontent yaratadi, GameType
+> katalogi 11 mexanika. Media FK'lar nullable (jonli ovoz/rasm — Faza 3). Keyingi: **Faza 3**
+> (media pipeline + kontent API) → [[04-Vazifalar/Backlog#🟦 Faza 3|Backlog Faza 3]].
+
 ## ✅ Faza 1 — Auth + ota-ona akkaunti + bola profillari (2026-06-27)
 [[SPEC]] §8, §2.8 — autentifikatsiya, ota-ona akkaunti, bola profillari. **Bajarildi, sinovdan o'tdi, xavfsizlik ko'rib chiqildi.**
 
@@ -67,6 +86,6 @@ API health 200, frontend ochiladi, migratsiyalar o'tadi, Celery worker ulanadi. 
 - [x] Yo'l xaritasi va 11 faza rejalashtirildi ✅ 2026-06-26 #modul/loyiha → [[03-Reja/Yol-Xaritasi|🛣️ Yo'l xaritasi]]
 
 ## 📊 Statistika
-- Bajarilgan: rejalashtirish (**5**) + Faza 0 skeleton (**19**) + Faza 1 auth (**10**) = **34**
-- Joriy bosqich: **Faza 1 tugadi** → Faza 2'ga (kontent modeli) tayyorgarlik
+- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) = **44**
+- Joriy bosqich: **Faza 2 tugadi** → Faza 3'ga (media pipeline + kontent API) tayyorgarlik
 - Keyingi: [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[04-Vazifalar/Backlog|📥 Backlog]]

@@ -19,7 +19,7 @@ has_cmd() {
 }
 
 # Idempotent seed/setup buyruqlari. Yangi app qo'shilsa shu ro'yxatga qo'shing.
-for cmd in init_storage seed_demo; do
+for cmd in init_storage seed_content; do
     if has_cmd "$cmd"; then
         echo "[release] $cmd ishga tushdi"
         python manage.py "$cmd"

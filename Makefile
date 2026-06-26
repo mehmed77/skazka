@@ -23,8 +23,8 @@ migrate:        ## Migratsiyalarni qo'llash
 makemigrations: ## Migratsiya yaratish
 	$(COMPOSE) exec backend python manage.py makemigrations
 
-seed:           ## Demo kontent (placeholder — Faza 2'da to'ldiriladi)
-	$(COMPOSE) exec backend python manage.py seed_demo
+seed:           ## Demo kurikulum kontenti (idempotent)
+	$(COMPOSE) exec backend python manage.py seed_content
 
 superuser:      ## Admin yaratish
 	$(COMPOSE) exec backend python manage.py createsuperuser
