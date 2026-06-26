@@ -42,7 +42,7 @@ export default function ProfilesPage() {
   const doEnter = async (child: ChildProfile, pin?: string) => {
     try {
       await enter(child.id, pin);
-      router.push("/play");
+      router.push("/forest");
     } catch {
       setPinError(true);
     }

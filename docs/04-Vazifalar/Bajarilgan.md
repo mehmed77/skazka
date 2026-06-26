@@ -11,6 +11,23 @@ created: 2026-06-26
 > Bog'liq: [[04-Vazifalar/Backlog|📥 Backlog]] · [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[03-Reja/Bosqichlar#Faza 0|🪜 Faza 0]]
 > Tugagan vazifalar shu yerga sana bilan ko'chiriladi (eng yangisi tepada).
 
+## ✅ Faza 4 — Dizayn tizimi + bolalar UI qobig'i (2026-06-27)
+[[SPEC]] §7 — audio-birinchi, matnsiz, ulkan nishonlar; o'rmon xaritasi. **Frontend.**
+
+- [x] Dizayn tokenlari (Maqola `v()`/`cn()`/barrel mexanizmi + bolalar qiymatlari): yorqin **rang-ko'r xavfsiz** orange+blue palitra, status=rang+ikona, **Nunito** shrift, blob radius, iliq soyalar ✅ 2026-06-27 #modul/design → [[06-Modullar/Dizayn-Tizimi|🎨 Dizayn]]
+- [x] Komponentlar (ui-kit): Mishka (4 holat), Confetti, Card, BottomSheet, ulkan Button + **Framer Motion** (reduced-motion) ✅ 2026-06-27 #modul/frontend
+- [x] **Asset-slot** konvensiyasi: `MISHKA_MANIFEST` + `UI_AUDIO` — haqiqiy render/audio kod o'zgarmasdan tushadi ✅ 2026-06-27 #modul/frontend
+- [x] `useAudio` (audio-birinchi): element nomi yangraydi, bitta-ovoz, graceful ✅ 2026-06-27 #modul/frontend
+- [x] **`/forest`** o'rmon yo'li xaritasi — REAL `/api/v1/curriculum`dan (Level=qism, Theme=to'xtash, status ikona, Mishka) ✅ 2026-06-27 #modul/frontend
+- [x] `/forest/[theme]` stub (o'yin Faza 5); `contentApi` (bola-kontekst token) ✅ 2026-06-27 #modul/frontend
+- [x] **Bola zonasi devor bilan o'ralgan** (`(child)` route-group, AppBar yo'q; 🏠→Parent Gate→chiqish) ✅ 2026-06-27 #modul/frontend → [[06-Modullar/Accounts]]
+- [x] PWA (standalone, manifest); i18n (uz/ru); **7/7 Playwright** + build ✓ ✅ 2026-06-27
+
+> [!success] Faza 4 qabul mezonlari bajarildi
+> Bola o'rmon xaritasida yuradi (REAL curriculum), mavzu tanlaydi, teginish→ovoz+animatsiya; Mishka
+> holatlari (placeholder asset+real slot); matnsiz+ulkan nishon; devor bilan o'ralgan (Parent Gate).
+> Keyingi: **Faza 5** (o'yin dvigateli + 3 mexanika) → [[04-Vazifalar/Backlog#🟦 Faza 5|Backlog]].
+
 ## ✅ Faza 3 — Media pipeline + kontent API (2026-06-27)
 [[SPEC]] §9.2, §7.3 — frontend kontentni o'qiy oladigan birinchi faza. **Additiv.** Security review o'tdi.
 
@@ -104,6 +121,6 @@ API health 200, frontend ochiladi, migratsiyalar o'tadi, Celery worker ulanadi. 
 - [x] Yo'l xaritasi va 11 faza rejalashtirildi ✅ 2026-06-26 #modul/loyiha → [[03-Reja/Yol-Xaritasi|🛣️ Yo'l xaritasi]]
 
 ## 📊 Statistika
-- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) = **57**
-- Joriy bosqich: **Faza 3 tugadi** → Faza 4'ga (dizayn tizimi + bolalar UI) tayyorgarlik
+- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) + Faza 4 (**8**) = **65**
+- Joriy bosqich: **Faza 4 tugadi** → Faza 5'ga (o'yin dvigateli + 3 mexanika) tayyorgarlik
 - Keyingi: [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[04-Vazifalar/Backlog|📥 Backlog]]

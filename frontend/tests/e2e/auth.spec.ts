@@ -7,7 +7,7 @@ test("ota-ona ro'yxatdan o'tadi, profil yaratadi va kiradi", async ({ page }) =>
   await page.goto("/register");
   await page.getByPlaceholder("Ismingiz").fill("Test Ota-ona");
   await page.getByPlaceholder("Telefon", { exact: true }).fill(phone);
-  await page.getByPlaceholder("Parol").fill("secret12");
+  await page.getByPlaceholder("Parol").fill("Str0ngPass9");
   await page.getByRole("button", { name: "Ro'yxatdan o'tish" }).click();
 
   // /profiles ga o'tdi
@@ -24,5 +24,7 @@ test("ota-ona ro'yxatdan o'tadi, profil yaratadi va kiradi", async ({ page }) =>
   await expect(card).toBeVisible();
   await card.click();
 
-  await expect(page).toHaveURL(/\/play/);
+  // Bola uyi = o'rmon xaritasi (REAL /api/v1/curriculum dan)
+  await expect(page).toHaveURL(/\/forest/);
+  await expect(page.getByRole("button", { name: /Hayvonlar/ })).toBeVisible();
 });

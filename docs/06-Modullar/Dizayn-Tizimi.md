@@ -2,7 +2,7 @@
 title: Dizayn tizimi
 type: modul
 tags: [modul/design, loyiha, prioritet/high]
-status: rejada
+status: bajarildi
 faza: Faza 4
 created: 2026-06-26
 ---
@@ -58,15 +58,28 @@ stateDiagram-v2
 - **Web Audio API** — past kechikishli tovush; musiqa/qo'shiq alohida trek → [[06-Modullar/Media]].
 - Uzluksiz interaktivlik: har teginish animatsion javob beradi.
 
-## Parent Gate (SPEC §7.4)
+## Parent Gate (SPEC §7.4) — bola zonasini "devor bilan o'raydi"
 > [!warning] Kattalar tekshiruvi
-> Sozlama/xaridga kirishdan oldin: oddiy matematik misol yoki "uzoq bosib turing" —
-> bola tasodifan kira olmasin → [[06-Modullar/Accounts]].
+> Bola zonasi (`/forest`) **matnli ota-ona boshqaruvisiz** (`(child)` route-group, AppBar yo'q).
+> Burchakda kichik **🏠** → Parent Gate (matematik misol) → o'tgach kattalar menyusi (profil
+> almashtirish / chiqish). Gate o'tmasa — bolaga qaytadi (chiqib keta olmaydi). Gate Faza 1'dan
+> qayta ishlatilgan → [[06-Modullar/Accounts]].
 
-## Acceptance
-- [ ] Dizayn tokenlari `globals.css`'da CSS o'zgaruvchilari sifatida (palitra/radius/spacing/typography).
-- [ ] Tugmalar min 80–100px, rang-ko'r xavfsiz palitra (rang + shakl/ikona).
-- [ ] Audio-birinchi: element bosilganda nomi yangraydi, ovozli ko'rsatma.
-- [ ] Mishka maskot 4 holat (idle/cheer/think/celebrate) bilan ishlaydi.
-- [ ] Framer Motion silliq o'tishlar; PWA o'rnatiladigan, to'liq ekran.
-- [ ] Parent Gate sozlama/xaridni himoyalaydi.
+> [!success] Bajarildi (Faza 4 — 2026-06-27)
+> Dizayn tokenlari (yorqin **rang-ko'r xavfsiz** orange+blue palitra + status=rang+ikona, **Nunito**
+> shrift, blob radius, iliq soyalar — Maqola `v()`/`cn()`/barrel mexanizmida). Komponentlar: Mishka
+> (4 holat), Confetti, Card, BottomSheet, ulkan Button + **Framer Motion** (reduced-motion). `useAudio`
+> kengaytma (element nomi, bitta-ovoz, graceful). **Asset-slot:** Mishka 🐻 placeholder; haqiqiy render
+> `MISHKA_MANIFEST`'ga tushadi — kod o'zgarmaydi. **`/forest`** o'rmon xaritasi (REAL curriculum). 6/6 Playwright.
+
+## Ma'lum bo'shliqlar (Known gaps)
+- Haqiqiy Pixar-vari 3D Mishka render + jonli UI-audio — **asset ishlab chiqarish** (slot tayyor, kod kutmaydi).
+- GSAP ishlatilmadi (Framer Motion yetarli); kerak bo'lsa keyin.
+
+## Acceptance ✅
+- [x] Dizayn tokenlari `globals.css`'da CSS o'zgaruvchilari (palitra/radius/spacing/typography).
+- [x] Tugmalar min ~80–100px, rang-ko'r xavfsiz palitra (rang + shakl/ikona).
+- [x] Audio-birinchi: element bosilganda nomi yangraydi, ovozli ko'rsatma.
+- [x] Mishka maskot 4 holat (idle/cheer/think/celebrate) — placeholder asset + real API/slot.
+- [x] Framer Motion silliq o'tishlar (reduced-motion hurmat); PWA o'rnatiladigan, to'liq ekran.
+- [x] Parent Gate bola zonasidan chiqishni himoyalaydi (devor bilan o'ralgan).

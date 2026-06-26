@@ -48,8 +48,26 @@
     "soon": "O'yinlar Faza 4'da tayyor bo'ladi",
     "exit": "Chiqish"
   },
+  "forest": {
+    "title": "O'rmon yo'li",
+    "section": "O'rmonning {n}-qismi",
+    "loading": "O'rmon yuklanmoqda...",
+    "empty": "Hali kontent yo'q",
+    "exit": "Chiqish"
+  },
+  "stop": {
+    "soon": "Tez orada Mishka bilan o'ynaymiz!",
+    "lessons": "{n} ta dars tayyor",
+    "back": "Orqaga"
+  },
   "nav": {
     "profiles": "Profillar",
-    "settings": "Sozlamalar"
+    "settings": "Sozlamalar",
+    "home": "Uy"
+  },
+  "childExit": {
+    "parentArea": "Kattalar zonasi",
+    "title": "Kattalar menyusi",
+    "switch": "Profil almashtirish"
   }
 }

@@ -13,6 +13,12 @@ created: 2026-06-26
 
 SPEC §5: har mexanika **ko'nikma + retrieval** turiga bog'langan va `GameType` katalogida saqlanadi. Dars o'z so'zlarini shu mexanikalarga "quyadi" — har biri **data-driven** (kontentdan mustaqil).
 
+> [!info] Faza 4'da tayyorlangan poydevor (o'yin LOGIKASI Faza 5)
+> - `GameType` katalogi (11 mexanika + `schema_json`) — Faza 2; `config_json.games` (per-o'yin params) — Faza 2.5.
+> - `/lesson/{id}` to'liq resolve qilingan kontent (so'z+media URL+games+schema+confusable) — Faza 3.
+> - **Feedback komponentlari tayyor (Faza 4):** `Confetti` (to'g'ri javob), `Mishka` `cheer`/`celebrate` holatlari, `useAudio`.
+> - **Faza 5:** `GamePlayer` (config→render) + dars oqimi (intro→practice→mastery) + 3 mexanika + distractor tanlash (`exclude_confusable`). Bola zonasi qobig'i (`/forest`) tayyor → [[06-Modullar/Dizayn-Tizimi]].
+
 ## 11 mexanika (SPEC §5)
 
 | # | O'yin (uz / ru) | Ko'nikma | Retrieval turi | Yosh | Faza |

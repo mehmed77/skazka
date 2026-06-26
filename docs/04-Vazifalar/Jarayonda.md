@@ -13,20 +13,20 @@ created: 2026-06-26
 > bu yerga ko'chiriladi, tugaganda `[x]` qilinib [[04-Vazifalar/Bajarilgan|Bajarilgan]]'ga o'tadi.
 
 > [!info] Hozirgi holat
-> **Faza 0, 1, 2, 2.5, 3** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
-> Hozir taxta **bo'sh**: Faza 4'ga tayyorgarlik.
+> **Faza 0, 1, 2, 2.5, 3, 4** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
+> Hozir taxta **bo'sh**: Faza 5'ga tayyorgarlik.
 
-## 🟡 Faza 4 ga tayyorgarlik
-Faza 4 ([[SPEC]] §7) — Dizayn tizimi + bolalar UI qobig'i (PWA). Boshlashdan oldin:
+## 🟡 Faza 5 ga tayyorgarlik
+Faza 5 ([[SPEC]] §5) — O'yin dvigateli + 3 mexanika (data-driven). Boshlashdan oldin:
 
-- [ ] Dizayn tokenlari (CSS o'zgaruvchilari) — issiq/yorqin/rang-ko'r xavfsiz palitra (mavjud `globals.css` kengaytma) #modul/frontend → [[06-Modullar/Dizayn-Tizimi|🎨 Dizayn]]
-- [ ] `useAudio` (audio-birinchi) — kontent API'dan media URL bilan ulanish #modul/frontend
-- [ ] Mishka maskot holatlari (idle/cheer/think/celebrate) + sayohat xaritasi (curriculum'dan) #modul/frontend
+- [ ] `GamePlayer` arxitekturasi: `lesson` config (new_items + games + schema) → render (mexanika kontentdan mustaqil) #modul/frontend → [[06-Modullar/Oyin-Mexanikalari|🎮 O'yinlar]]
+- [ ] Dars oqimi: intro → practice (mini-o'yinlar) → mastery → natija ekrani #modul/frontend
+- [ ] Distractor tanlash (`exclude_confusable` — §4.4) + feedback (Confetti/Mishka cheer — Faza 4'da tayyor) #modul/frontend
 
 > [!tip] Pull nomzodlari (WIP ≤ 3)
-> 1. Dizayn tizimi: tokenlar + ulkan tugma/kartochka/modal + Mishka komponenti `#prioritet/high`
-> 2. Bolalar uy ekrani: sayohat xaritasi (`/api/v1/curriculum`) + audio-birinchi navigatsiya `#prioritet/high`
-> 3. PWA o'rnatish + to'liq ekran + offline qobiq (`frontend-design` skill) `#prioritet/medium`
+> 1. `GamePlayer` + dars oqimi (intro→practice→mastery→natija) `#prioritet/high`
+> 2. 3 mexanika: Eshit va bos, Juftla, Topib ber (data-driven, `/lesson` config'dan) `#prioritet/high`
+> 3. Javob feedback'i (to'g'ri→Confetti+Mishka cheer; xato→jazo yo'q, maslahat) `#prioritet/high`
 
 ## ⛔ Bloklangan (Blocked)
 _(Yo'q)_

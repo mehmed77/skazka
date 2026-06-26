@@ -21,3 +21,36 @@ export type ChildProfile = {
 };
 
 export type AuthResponse = { access: string; refresh: string; parent: Parent };
+
+// ── Kontent API (Faza 3) ──
+export type ThemeStatus = "locked" | "available" | "started" | "done";
+
+export type CurriculumLesson = {
+  id: string;
+  order: number;
+  title_uz: string;
+  title_ru: string;
+  min_age_band: AgeBand;
+  progress: { status: string };
+};
+export type CurriculumTheme = {
+  id: string;
+  order: number;
+  key: string;
+  title_uz: string;
+  title_ru: string;
+  icon: string;
+  lessons: CurriculumLesson[];
+};
+export type CurriculumLevel = {
+  id: string;
+  order: number;
+  title_uz: string;
+  title_ru: string;
+  themes: CurriculumTheme[];
+};
+export type Curriculum = {
+  child: { id: string; display_name: string; age_band: AgeBand };
+  language: string;
+  levels: CurriculumLevel[];
+};

@@ -1,10 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Nunito } from "next/font/google";
 
 import { Providers } from "./providers";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter" });
+// Yumaloq, do'stona shrift (bolalarbop) — kirill + lotin
+const nunito = Nunito({ subsets: ["latin", "cyrillic"], variable: "--font-nunito" });
 
 export const metadata: Metadata = {
   title: "SKAZKA — Mishka bilan rus tili",
@@ -23,7 +24,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="uz" className={inter.variable} suppressHydrationWarning>
+    <html lang="uz" className={nunito.variable} suppressHydrationWarning>
       <body className="font-sans">
         <Providers>{children}</Providers>
       </body>

@@ -4,17 +4,17 @@
 
 @layer base {
   :root {
-    /* Sirt (light) — iliq, yumshoq fon (§7.2) */
-    --bg: 255 251 245;
-    --fg: 60 40 30;
+    /* ── Sirt (yorqin, iliq, bolalarbop) ── */
+    --bg: 255 248 237; /* iliq krem */
+    --fg: 46 33 22; /* iliq to'q jigarrang */
     --card: 255 255 255;
-    --muted: 255 244 230;
-    --muted-fg: 140 120 105;
-    --border: 245 230 215;
-    --input: 235 220 205;
+    --muted: 255 240 220;
+    --muted-fg: 122 102 84;
+    --border: 250 226 198;
+    --input: 240 220 198;
     --ring: 249 115 22;
 
-    /* Brend — iliq apelsin (Mishka/quvonch) */
+    /* ── Brend — jonli apelsin (energiya, Mishka) ── */
     --brand-50: 255 247 237;
     --brand-100: 255 237 213;
     --brand-200: 254 215 170;
@@ -27,25 +27,52 @@
     --brand-900: 124 45 18;
     --brand-fg: 255 255 255;
 
-    /* O'ynoqi aksent — osmon-ko'k */
+    /* ── Aksent — osmon-ko'k (orange+blue = rang-ko'r xavfsiz juftlik) ── */
     --accent: 14 165 233;
     --accent-600: 2 132 199;
     --accent-fg: 255 255 255;
+
+    /* ── Qo'shimcha jonli ranglar (har doim shakl/ikona bilan) ── */
+    --success: 34 197 94; /* yashil — doim ✓ bilan */
+    --success-fg: 255 255 255;
+    --grape: 168 85 247; /* siyohrang */
+    --sun: 250 204 21; /* sariq */
+
+    /* ── O'rmon xaritasi ── */
+    --forest: 22 163 74; /* o'rmon yashili */
+    --forest-deep: 21 128 61;
+    --path: 214 178 122; /* o'rmon yo'li (qum/tuproq) */
+
+    /* ── Status (RANG + IKONA — rang yagona ma'no tashuvchi emas) ── */
+    --status-locked: 148 163 184; /* 🔒 kulrang */
+    --status-available: 249 115 22; /* ✨ brend */
+    --status-started: 14 165 233; /* ▶ aksent */
+    --status-done: 34 197 94; /* ⭐ yashil */
   }
 
   .dark {
-    --bg: 28 22 18;
-    --fg: 250 240 230;
-    --card: 40 31 25;
-    --muted: 52 40 32;
-    --muted-fg: 180 160 145;
-    --border: 64 50 40;
-    --input: 74 58 46;
+    --bg: 30 22 16;
+    --fg: 250 240 228;
+    --card: 43 32 24;
+    --muted: 56 42 32;
+    --muted-fg: 188 168 150;
+    --border: 70 54 42;
+    --input: 80 62 48;
     --ring: 251 146 60;
-
     --accent: 56 189 248;
     --accent-600: 14 165 233;
-    --accent-fg: 16 20 24;
+    --accent-fg: 16 22 28;
+  }
+
+  /* reduced-motion — animatsiyalarni o'chiradi (qulaylik) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
   }
 
   body {
