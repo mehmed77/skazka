@@ -1,0 +1,26 @@
+# ── Core ─────────────────────────────────────────
+Django==5.1.4
+djangorestframework==3.15.2
+djangorestframework-simplejwt==5.3.1
+drf-spectacular==0.28.0
+django-filter==24.3
+django-cors-headers==4.6.0
+
+# ── Database ─────────────────────────────────────
+psycopg[binary]==3.2.3
+
+# ── Async / tasks ────────────────────────────────
+celery==5.4.0
+redis==5.2.1
+django-celery-beat==2.7.0
+
+# ── File storage (MinIO / S3) — audio/rasm media ──
+django-storages==1.14.4
+boto3==1.35.80
+
+# ── Config / security ────────────────────────────
+django-environ==0.11.2
+argon2-cffi==23.1.0
+
+# ── Server ───────────────────────────────────────
+gunicorn==23.0.0

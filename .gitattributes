@@ -1,0 +1,2 @@
+# Shell skriptlari konteynerda ishlaydi — har doim LF bo'lsin (CRLF ularni buzadi).
+*.sh text eol=lf

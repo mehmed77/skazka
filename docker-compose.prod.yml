@@ -1,0 +1,51 @@
+# SKAZKA — production overrides
+# Ishga tushirish:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+name: skazka
+
+services:
+  backend:
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py init_storage &&
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4 --timeout 120"
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+      DJANGO_DEBUG: "False"
+    volumes:
+      - staticfiles:/app/staticfiles
+    restart: unless-stopped
+
+  worker:
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+    restart: unless-stopped
+
+  beat:
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.prod
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../docker/frontend.Dockerfile
+      target: prod
+    command: npm run start
+    restart: unless-stopped
+
+  nginx:
+    volumes:
+      - ./nginx/proxy_params:/etc/nginx/proxy_params:ro
+      - ./nginx/prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/letsencrypt:ro
+      - staticfiles:/var/www/static:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+
+  db:
+    ports: []   # prod'da DB tashqariga ochilmaydi
+    restart: unless-stopped

@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Sirt (light) — iliq, yumshoq fon (§7.2) */
+    --bg: 255 251 245;
+    --fg: 60 40 30;
+    --card: 255 255 255;
+    --muted: 255 244 230;
+    --muted-fg: 140 120 105;
+    --border: 245 230 215;
+    --input: 235 220 205;
+    --ring: 249 115 22;
+
+    /* Brend — iliq apelsin (Mishka/quvonch) */
+    --brand-50: 255 247 237;
+    --brand-100: 255 237 213;
+    --brand-200: 254 215 170;
+    --brand-300: 253 186 116;
+    --brand-400: 251 146 60;
+    --brand-500: 249 115 22;
+    --brand-600: 234 88 12;
+    --brand-700: 194 65 12;
+    --brand-800: 154 52 18;
+    --brand-900: 124 45 18;
+    --brand-fg: 255 255 255;
+
+    /* O'ynoqi aksent — osmon-ko'k */
+    --accent: 14 165 233;
+    --accent-600: 2 132 199;
+    --accent-fg: 255 255 255;
+  }
+
+  .dark {
+    --bg: 28 22 18;
+    --fg: 250 240 230;
+    --card: 40 31 25;
+    --muted: 52 40 32;
+    --muted-fg: 180 160 145;
+    --border: 64 50 40;
+    --input: 74 58 46;
+    --ring: 251 146 60;
+
+    --accent: 56 189 248;
+    --accent-600: 14 165 233;
+    --accent-fg: 16 20 24;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}

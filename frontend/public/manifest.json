@@ -1,0 +1,20 @@
+{
+  "name": "SKAZKA — Mishka bilan rus tili",
+  "short_name": "SKAZKA",
+  "description": "Bolalar uchun rus tilini o'yin orqali o'rgatuvchi platforma",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fffbf5",
+  "theme_color": "#f97316",
+  "lang": "uz",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

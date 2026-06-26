@@ -1,0 +1,45 @@
+# ── Python / Django ──────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.sqlite3
+/backend/staticfiles/
+/backend/media/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# ── Node / Next.js ───────────────────────────────
+node_modules/
+.next/
+out/
+# Playwright artefaktlari
+test-results/
+playwright-report/
+.playwright/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ── Env / secrets ────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── Docker / data volumes ────────────────────────
+/data/
+/backups/
+
+# ── Editor / OS ──────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+
+# ── Obsidian (vault config is local) ─────────────
+docs/.obsidian/workspace*.json
+docs/.trash/
