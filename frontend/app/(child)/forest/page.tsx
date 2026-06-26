@@ -63,8 +63,12 @@ export default function ForestPage() {
       playCue("locked");
       return;
     }
-    const q = new URLSearchParams({ t: title, i: theme.icon || "🌲" });
-    router.push(`/forest/${theme.id}?${q.toString()}`);
+    const lessonId = theme.lessons?.[0]?.id;
+    if (!lessonId) {
+      playCue("soon"); // hali dars yo'q
+      return;
+    }
+    router.push(`/lesson/${lessonId}`); // darsni boshlash (GamePlayer)
   };
 
   return (

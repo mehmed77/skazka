@@ -17,6 +17,12 @@ SPEC §4: platformaning **eng muhim va eng murakkab** qismi — **ko'rinmas SRS*
 > Bu modul boshqa hamma o'yinning haydovchisi: kontent qaysi so'zni, qachon ko'rsatishini
 > shu yer hal qiladi. Algoritm tafsiloti → [[02-Arxitektura/SRS-Dvigateli]].
 
+> [!note] Faza 5'da frontend kontrakti QO'YILDI (ADR-010 / [[99-Resurslar/Qaror-Jurnali#ADR-012 — O'yin dvigateli: registry plugin + frontend distraktor|ADR-012]])
+> O'yin dvigateli (Faza 5) Faza 6 ulanishini kutib quyidagi interfeyslarni allaqachon chaqiradi —
+> **Faza 6 ularni real qiladi, `GamePlayer` o'zgarmaydi:**
+> - `lib/games/session.buildSessionQueue(newItems, dueItems=[])` — hozir `due=[]` (faqat dars so'zlari, confusable yonma-yon emas). Faza 6: `dueItems = srs.get_due(child)` → `interleave`.
+> - `lib/learningEvents.recordResult(...)` — hozir `localStorage` outbox (`item_type/item_id/game_type/is_correct/latency_ms/hint_used` — `LearningEvent` maydonlariga 1:1). Faza 6: `POST /api/v1/learning/event/` (outbox sync).
+
 ## Modellar (SPEC §10)
 
 | Model | Asosiy maydonlar |

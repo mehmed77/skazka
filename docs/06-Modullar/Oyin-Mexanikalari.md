@@ -2,7 +2,7 @@
 title: O'yin mexanikalari
 type: modul
 tags: [modul/games, loyiha, prioritet/high]
-status: rejada
+status: qisman
 faza: Faza 5, 7, 9
 created: 2026-06-26
 ---
@@ -48,6 +48,25 @@ flowchart LR
 ```
 
 Yangi so'z qo'shilsa — hamma o'yin avtomatik ishlaydi (mexanika kontentga bog'lanmagan). Umumiy `GamePlayer` `GameType.schema_json` + kontent + SRS navbatini birlashtirib render qiladi.
+
+## Mexanika = REGISTRY plugin (Faza 5 qarori — [[99-Resurslar/Qaror-Jurnali#ADR-012 — O'yin dvigateli: registry plugin + frontend distraktor|ADR-012]])
+> [!important] Markaziy `if/elif` YO'Q
+> Har mexanika alohida komponent va o'zini `registerMechanic(key, Component)` orqali ro'yxatga oladi
+> (`frontend/lib/games/registry.ts`). `GamePlayer` faqat **kontrakt** beradi:
+> `MechanicProps { items, pool, spec, ageBand, onResult, onDone }`. Mexanika o'zini renderlaydi,
+> javobni qabul qiladi, `onResult(correct, latencyMs, hintUsed)` qaytaradi.
+> **Yangi mexanika = yangi komponent + `mechanics/index.ts`ga 1 qator.** GamePlayer o'zgarmaydi →
+> Faza 7 (harf_ovi, harf_chiz, qaysi_tovush, so'z_qur) va Faza 9 (sehrli_ertak, qo'shiq) shunchaki plugin.
+
+## Distraktor tanlash (§4.4) — FRONTEND (Faza 5'da paydo bo'ldi)
+- `frontend/lib/games/distractors.ts`: `buildOptions(target, pool, optionCount, excludeConfusable)`.
+- **Manba** = mavzu/dars so'zlari (joriy to'g'ridan tashqari). `/lesson` javobi `confusable_ids` + so'zlarni yetkazadi → backend qo'shimcha so'rovsiz.
+- `exclude_confusable: true` → `confusable_ids` distraktor bo'la **olmaydi** (кошка↔коза yonma-yon chiqmaydi — §4.4 interferensiya).
+- `option_count`: schema `[2,4]` diapazonidan **age_band** bo'yicha (3-4→2, 5-6→3, 6-7→4) — config'da QOTIRILMAGAN. Graceful (kichik mavzu → kamroq, lekin ≥2).
+
+## Faza 6 kontrakti tayyor (ADR-010) — GamePlayer o'zgarmasin
+- `lib/games/session.buildSessionQueue(newItems, dueItems=[])` — hozir `due=[]`; Faza 6 SRS due so'zlarni `interleave` qiladi (confusable yonma-yon emas).
+- `lib/learningEvents.recordResult(...)` — hozir `localStorage` outbox; Faza 6 → `POST /api/v1/learning/event/`. Interfeys o'zgarmaydi.
 
 ## Feedback qoidalari (jazo YO'Q)
 > [!success] To'g'ri javob

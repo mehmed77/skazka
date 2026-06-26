@@ -29,6 +29,7 @@ created: 2026-06-26
 | [[#ADR-009 — Faza 1 xavfsizlik qotirish va kechiktirilgan elementlar\|ADR-009]] | Auth xavfsizligi | ✅ qabul qilingan |
 | [[#ADR-010 — Kontent kontrakti (confusable + config_json v2 + SRS)\|ADR-010]] | Kontent/SRS kontrakti | ✅ qabul qilingan |
 | [[#ADR-011 — Faza 3 xavfsizlik review + public-media xulosasi\|ADR-011]] | Public media + media/API xavfsizligi | ✅ qabul qilingan |
+| [[#ADR-012 — O'yin dvigateli: registry plugin + frontend distraktor\|ADR-012]] | Mexanika registry + §4.4 distraktor joyi | ✅ qabul qilingan |
 
 ---
 
@@ -124,6 +125,46 @@ Empirik tasdiqlandi: bucket policy **faqat `s3:GetObject`** — anonim **GET→2
 - Unbounded `file.read()` (25MB upload cap + anonim PUT yo'q → mitigatsiya).
 - To'liq rate-limit/WAF infra → Faza 10 (sayqal).
 - **Oqibat:** Media/kontent qatlami xavfsizlik tasdig'i bilan git'ga muhrlandi; public-media qarori rasman tasdiqlandi. 32 pytest yashil. Qarang [[06-Modullar/Media]], [[02-Arxitektura/Xavfsizlik]].
+
+---
+
+## ADR-012 — O'yin dvigateli: registry plugin + frontend distraktor
+**Holat:** ✅ qabul qilingan · Faza 5 · 2026-06-27
+
+**Kontekst.** Faza 5 — data-driven o'yin dvigateli + 3 mexanika (Eshit va bos, Juftla, Topib ber).
+SPEC §5'da 11 mexanika (Faza 5/7/9/11). §4.4 — distraktor (chalg'ituvchi) interferensiya: confusable
+so'zlar yonma-yon chiqmasligi kerak. Ikki qaror talab qilindi.
+
+**Qaror 1 — Mexanika = o'z-o'zini ro'yxatga oluvchi PLUGIN (registry).**
+- `GamePlayer` ichida `if game_type == ...` YO'Q. Har mexanika alohida komponent →
+  `registerMechanic(key, Component)` (`frontend/lib/games/registry.ts`).
+- `GamePlayer` faqat kontrakt beradi: `MechanicProps { items, pool, spec, ageBand, onResult, onDone }`.
+- **Yangi mexanika = komponent + `mechanics/index.ts`ga 1 qator.** Markaziy fayl o'zgarmaydi.
+- **Sabab:** Faza 7 (harf_ovi, harf_chiz, qaysi_tovush, so'z_qur) va Faza 9 (sehrli_ertak, qo'shiq)
+  markaziy `GamePlayer`ni shishirmasin — ular shunchaki yangi plugin bo'ladi (ochiq-yopiq prinsipi).
+
+**Qaror 2 — Distraktor tanlash FRONTEND'da (§4.4).**
+- `/lesson` javobi `confusable_ids` + mavzu so'zlarini allaqachon yetkazadi (Faza 3) → backend qo'shimcha
+  so'rovsiz. `frontend/lib/games/distractors.buildOptions(target, pool, optionCount, excludeConfusable)`.
+- **Manba** = mavzu so'zlari; `exclude_confusable: true` → `confusable_ids` distraktor bo'la olmaydi
+  (кошка↔коза yonma-yon emas). `option_count` schema `[2,4]`dan **age_band** bo'yicha (3-4→2…). Graceful ≥2.
+- **Sabab:** oddiyroq (server holatsiz), deterministik test qilsa bo'ladi; backend helper kerak emas.
+  (Muqobil — backend helper — rad etilmadi, lekin hozir kerak emas; Faza 6 SRS bilan qayta ko'riladi.)
+
+**Faza 6 kontrakti (ADR-010 davomi).** `buildSessionQueue(new, due=[])` + `recordResult(...)` (lokal outbox)
+interfeyslari HOZIR qo'yildi → Faza 6 SRS due/event ulanishi `GamePlayer`ni o'zgartirmaydi.
+
+**Oqibat.** 3 mexanika plugin sifatida ishlaydi; dars to'liq o'ynaladi (intro→practice→mastery→natija);
+§4.4 distraktor va age_band option_count Playwright bilan tasdiqlandi (12/12). Qarang
+[[06-Modullar/Oyin-Mexanikalari]], [[06-Modullar/SRS-Learning]].
+
+**Adversarial review (commit'dan oldin, 4 o'lcham × tasdiqlash — Faza 1/3 uslubi).** 25 topilma →
+5 tasdiqlandi va tuzatildi: (1) bo'sh `games[]` play-step → boshi-berk (GamePlayer skip effekti
+kengaytirildi); (2) bo'sh navbat → mexanika qotib qoladi (markaziy guard + Juftla bo'sh-holat);
+(3) "jazo yo'q" buzilgan edi — yulduz xato urinishlardan hisoblanardi → endi `firstTryWins/itemsDone`
+(min 1 yulduz, doim ijobiy); (4) `buildOptions` ≥2 variant kafolati (kichik pool graceful);
+(5) refetch'da navbat qayta aralashardi → `lesson.id` depKey + `staleTime`. Faza 6 kontraktini
+mustahkamlash: **`useSessionQueue` hook** — due-ulanish bitta joyda, GamePlayer abadiy o'zgarmaydi.
 
 ---
 

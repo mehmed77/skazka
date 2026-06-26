@@ -69,5 +69,11 @@
     "parentArea": "Kattalar zonasi",
     "title": "Kattalar menyusi",
     "switch": "Profil almashtirish"
+  },
+  "lesson": {
+    "start": "Boshlash",
+    "done": "Ofarin!",
+    "again": "Yana",
+    "home": "Uyga"
   }
 }

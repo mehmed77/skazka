@@ -13,20 +13,21 @@ created: 2026-06-26
 > bu yerga ko'chiriladi, tugaganda `[x]` qilinib [[04-Vazifalar/Bajarilgan|Bajarilgan]]'ga o'tadi.
 
 > [!info] Hozirgi holat
-> **Faza 0, 1, 2, 2.5, 3, 4** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
-> Hozir taxta **bo'sh**: Faza 5'ga tayyorgarlik.
+> **Faza 0, 1, 2, 2.5, 3, 4, 5** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
+> Hozir taxta **bo'sh**: Faza 6'ga tayyorgarlik.
 
-## 🟡 Faza 5 ga tayyorgarlik
-Faza 5 ([[SPEC]] §5) — O'yin dvigateli + 3 mexanika (data-driven). Boshlashdan oldin:
+## 🟡 Faza 6 ga tayyorgarlik
+Faza 6 ([[SPEC]] §4) — SRS (FSRS-lite) + rivoj + Takrorlash o'yini. Boshlashdan oldin:
 
-- [ ] `GamePlayer` arxitekturasi: `lesson` config (new_items + games + schema) → render (mexanika kontentdan mustaqil) #modul/frontend → [[06-Modullar/Oyin-Mexanikalari|🎮 O'yinlar]]
-- [ ] Dars oqimi: intro → practice (mini-o'yinlar) → mastery → natija ekrani #modul/frontend
-- [ ] Distractor tanlash (`exclude_confusable` — §4.4) + feedback (Confetti/Mishka cheer — Faza 4'da tayyor) #modul/frontend
+- [ ] **Backend:** `LearningEvent` qabul (`POST /learning/event/`, bola-kontekst, idempotent) + SRS holati (`ItemState`) #modul/srs → [[06-Modullar/SRS-Learning|🔁 SRS]]
+- [ ] **`get_due` / session navbat:** due+new interleave; `/curriculum` `progress.status` REAL (locked/started/done) #modul/srs
+- [ ] **Frontend ulanish (GamePlayer O'ZGARMAYDI — ADR-010):** `recordResult` → `POST /learning/event/` (outbox sync); `buildSessionQueue` due so'zlarni oladi #modul/games
+- [ ] Takrorlash o'yini (mexanika #11 — aralash due) registry plugin sifatida #modul/games
 
 > [!tip] Pull nomzodlari (WIP ≤ 3)
-> 1. `GamePlayer` + dars oqimi (intro→practice→mastery→natija) `#prioritet/high`
-> 2. 3 mexanika: Eshit va bos, Juftla, Topib ber (data-driven, `/lesson` config'dan) `#prioritet/high`
-> 3. Javob feedback'i (to'g'ri→Confetti+Mishka cheer; xato→jazo yo'q, maslahat) `#prioritet/high`
+> 1. Backend SRS (`ItemState` + FSRS-lite `get_due` + `LearningEvent` endpoint) `#prioritet/high`
+> 2. Frontend ulanish: outbox→event sync + `buildSessionQueue(due)` + REAL progress `#prioritet/high`
+> 3. Rivoj/progress ko'rsatish (xaritada status) + Takrorlash o'yini plugin `#prioritet/medium`
 
 ## ⛔ Bloklangan (Blocked)
 _(Yo'q)_

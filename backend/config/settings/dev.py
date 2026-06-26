@@ -1,10 +1,25 @@
 """Development sozlamalari."""
 
 from .base import *  # noqa: F401,F403
-from .base import env
+from .base import REST_FRAMEWORK, env
 
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
+
+# Dev'da rate-limit SAXIY — e2e (Playwright har testda register qiladi) va qo'lda test
+# trafigini bo'g'masin. Throttle MEXANIZMI qoladi (faqat rate yuqori). Prod base'da QATTIQ
+# (register 30/hour) — bu override faqat dev.py'da.
+REST_FRAMEWORK = {
+    **REST_FRAMEWORK,
+    "DEFAULT_THROTTLE_RATES": {
+        **REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"],
+        "login": "2000/min",
+        "register": "2000/hour",
+        "profiles": "6000/hour",
+        "pin_entry": "1000/min",
+        "content": "6000/min",
+    },
+}
 
 # Dev'da email konsolga chiqadi
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

@@ -11,6 +11,24 @@ created: 2026-06-26
 > Bog'liq: [[04-Vazifalar/Backlog|📥 Backlog]] · [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[03-Reja/Bosqichlar#Faza 0|🪜 Faza 0]]
 > Tugagan vazifalar shu yerga sana bilan ko'chiriladi (eng yangisi tepada).
 
+## ✅ Faza 5 — O'yin dvigateli + 3 mexanika (2026-06-27)
+[[SPEC]] §5 + §4.4 — data-driven dvigatel; bola nihoyat so'z o'rgana boshlaydi. **Asosan frontend** (additiv, DB reset yo'q).
+
+- [x] **Registry plugin arxitekturasi** (markaziy if/elif YO'Q): `registerMechanic(key, Component)`; `GamePlayer` faqat `MechanicProps` kontrakti beradi ✅ 2026-06-27 #modul/games → [[99-Resurslar/Qaror-Jurnali#ADR-012 — O'yin dvigateli: registry plugin + frontend distraktor|ADR-012]]
+- [x] **GamePlayer oqimi:** intro → practice → mastery → natija (REAL `/lesson` kontentidan; `steps[]`/`new_items`/`games[]`) ✅ 2026-06-27 #modul/games
+- [x] **3 mexanika (plugin):** Eshit va bos (eshit_va_bos), Juftla (juftla, memory), Topib ber (topib_ber, TPR) ✅ 2026-06-27 #modul/games
+- [x] **Distraktor §4.4 (frontend):** mavzu manbai, `confusable_ids` istisno (кошка↛коза), `option_count` age_band bo'yicha (3-4→2), graceful ≥2 ✅ 2026-06-27 #modul/games
+- [x] **Feedback (Faza 4 komponentlari):** to'g'ri→Mishka cheer + Confetti + ovoz; xato→JAZO YO'Q, think + qayta imkon ✅ 2026-06-27 #modul/games
+- [x] **Faza 6 kontrakti tayyor (ADR-010):** `buildSessionQueue(new, due=[])` + `recordResult(...)` (lokal outbox) — GamePlayer o'zgarmaydi ✅ 2026-06-27 #modul/srs → [[06-Modullar/SRS-Learning]]
+- [x] So'z vizuali asset-slot (`image_url` real → rasm; yo'q → emoji placeholder); matnsiz + ulkan nishon ✅ 2026-06-27 #modul/frontend
+- [x] Forest theme → `/lesson/{id}` (stub o'rniga); typecheck + lint + build ✓; **12/12 Playwright** ✅ 2026-06-27
+- [x] **Adversarial review** (commit oldidan, 4 o'lcham × tasdiqlash): 25 topilma → 5 tuzatildi (2 boshi-berk guard, "jazo yo'q" yulduz, ≥2 variant, refetch barqarorlik); `useSessionQueue` hook ✅ 2026-06-27 → [[99-Resurslar/Qaror-Jurnali#ADR-012 — O'yin dvigateli: registry plugin + frontend distraktor|ADR-012]]
+
+> [!success] Faza 5 qabul mezonlari bajarildi
+> Bola haqiqiy darsni boshidan oxiriga o'ynaydi; mexanika = registry plugin (yangi = 1 qator);
+> distraktor §4.4 (confusable istisno, age_band son); to'g'ri→cheer+Confetti, xato→jazosiz qayta imkon;
+> `onResult` lokal yoziladi, Faza 6 interfeysi tayyor. Keyingi: **Faza 6** (SRS + rivoj + Takrorlash o'yini).
+
 ## ✅ Faza 4 — Dizayn tizimi + bolalar UI qobig'i (2026-06-27)
 [[SPEC]] §7 — audio-birinchi, matnsiz, ulkan nishonlar; o'rmon xaritasi. **Frontend.**
 
@@ -121,6 +139,6 @@ API health 200, frontend ochiladi, migratsiyalar o'tadi, Celery worker ulanadi. 
 - [x] Yo'l xaritasi va 11 faza rejalashtirildi ✅ 2026-06-26 #modul/loyiha → [[03-Reja/Yol-Xaritasi|🛣️ Yo'l xaritasi]]
 
 ## 📊 Statistika
-- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) + Faza 4 (**8**) = **65**
-- Joriy bosqich: **Faza 4 tugadi** → Faza 5'ga (o'yin dvigateli + 3 mexanika) tayyorgarlik
+- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) + Faza 4 (**8**) + Faza 5 (**8**) = **73**
+- Joriy bosqich: **Faza 5 tugadi** → Faza 6'ga (SRS + rivoj + Takrorlash o'yini) tayyorgarlik
 - Keyingi: [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[04-Vazifalar/Backlog|📥 Backlog]]
