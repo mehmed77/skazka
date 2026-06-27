@@ -40,8 +40,12 @@ class ItemState(BaseModel):
     lapses = models.PositiveIntegerField("unutishlar", default=0)
 
     # ── Mastery (§4.3): reseptiv (tanib olish) ALOHIDA ekspressiv (aytib berish) ──
-    receptive_strength = models.FloatField("reseptiv kuch", default=0.0)  # 0..1, hozir haydaladi
-    expressive_strength = models.FloatField("ekspressiv kuch", default=0.0)  # Faza 7/9 to'ldiradi
+    receptive_strength = models.FloatField(
+        "reseptiv kuch", default=0.0
+    )  # 0..1, hozir haydaladi
+    expressive_strength = models.FloatField(
+        "ekspressiv kuch", default=0.0
+    )  # Faza 7/9 to'ldiradi
 
     exposures = models.PositiveIntegerField("ko'rishlar", default=0)
     last_result = models.BooleanField("oxirgi natija", null=True, blank=True)

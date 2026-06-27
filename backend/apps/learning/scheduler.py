@@ -26,7 +26,9 @@ RECEPTIVE = "receptive"
 EXPRESSIVE = "expressive"
 
 
-def schedule(state, is_correct: bool, latency_ms: int | None = None, dimension: str = RECEPTIVE):
+def schedule(
+    state, is_correct: bool, latency_ms: int | None = None, dimension: str = RECEPTIVE
+):
     """ItemState'ni yangilaydi (yangi due_at + tegishli strength). state'ni mutatsiya qilib qaytaradi.
 
     To'g'ri → interval/stability oshadi (due_at uzoqlashadi), strength oshadi.
@@ -40,7 +42,9 @@ def schedule(state, is_correct: bool, latency_ms: int | None = None, dimension: 
         if state.reps < len(FIRST_INTERVALS):
             interval_days = FIRST_INTERVALS[state.reps]
         else:
-            interval_days = min(round(max(state.stability, 1.0) * EASE), MAX_INTERVAL_DAYS)
+            interval_days = min(
+                round(max(state.stability, 1.0) * EASE), MAX_INTERVAL_DAYS
+            )
         state.reps += 1
         state.stability = float(interval_days)
         state.difficulty = max(0.0, state.difficulty - 0.05)

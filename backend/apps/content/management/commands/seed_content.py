@@ -162,10 +162,38 @@ DIMENSIONS = {
 
 # Kirill harf → tovush (IPA-soda). Dinamik harf seed (mavzu so'zlari harflari) uchun.
 RU_SOUNDS = {
-    "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "je", "ё": "jo", "ж": "zh",
-    "з": "z", "и": "i", "й": "j", "к": "k", "л": "l", "м": "m", "н": "n", "о": "o",
-    "п": "p", "р": "r", "с": "s", "т": "t", "у": "u", "ф": "f", "х": "x", "ц": "ts",
-    "ч": "ch", "ш": "sh", "щ": "shch", "ъ": "", "ы": "y", "ь": "", "э": "e", "ю": "ju",
+    "а": "a",
+    "б": "b",
+    "в": "v",
+    "г": "g",
+    "д": "d",
+    "е": "je",
+    "ё": "jo",
+    "ж": "zh",
+    "з": "z",
+    "и": "i",
+    "й": "j",
+    "к": "k",
+    "л": "l",
+    "м": "m",
+    "н": "n",
+    "о": "o",
+    "п": "p",
+    "р": "r",
+    "с": "s",
+    "т": "t",
+    "у": "u",
+    "ф": "f",
+    "х": "x",
+    "ц": "ts",
+    "ч": "ch",
+    "ш": "sh",
+    "щ": "shch",
+    "ъ": "",
+    "ы": "y",
+    "ь": "",
+    "э": "e",
+    "ю": "ju",
     "я": "ja",
 }
 
@@ -269,7 +297,9 @@ class Command(BaseCommand):
             )
         # Mavzu so'zlaridagi BARCHA kirill harflarni Letter sifatida (so'z_qur/takrorlash uchun).
         # Murakkab harflar (ж,ц,ч,ш,щ,ы,ъ,ь) faqat RECORD — alohida drill YO'Q (§3, keyin).
-        existing = set(Letter.objects.filter(language=ru).values_list("char", flat=True))
+        existing = set(
+            Letter.objects.filter(language=ru).values_list("char", flat=True)
+        )
         next_order = Letter.objects.filter(language=ru).count()
         for w in Word.objects.filter(language=ru):
             for ch in w.lemma.upper():
@@ -383,7 +413,12 @@ class Command(BaseCommand):
         theme, _ = Theme.objects.get_or_create(
             level=level,
             key="alphabet",
-            defaults={"order": 3, "title_uz": "Alifbo", "title_ru": "Алфавит", "icon": "🔤"},
+            defaults={
+                "order": 3,
+                "title_uz": "Alifbo",
+                "title_ru": "Алфавит",
+                "icon": "🔤",
+            },
         )
         group1 = list(Letter.objects.filter(language=ru, group_no=1).order_by("order"))
         letter_items = [{"type": "letter", "id": str(ltr.id)} for ltr in group1]
@@ -392,35 +427,73 @@ class Command(BaseCommand):
         lesson1, _ = Lesson.objects.get_or_create(
             theme=theme,
             order=1,
-            defaults={"title_uz": "Alifbo — 1-guruh", "title_ru": "Алфавит — 1", "min_age_band": "5-6"},
+            defaults={
+                "title_uz": "Alifbo — 1-guruh",
+                "title_ru": "Алфавит — 1",
+                "min_age_band": "5-6",
+            },
         )
         steps1 = [
-            (1, StepKind.INTRO, {"new_items": letter_items, "games": [{"type": "harf_ovi"}]}),
+            (
+                1,
+                StepKind.INTRO,
+                {"new_items": letter_items, "games": [{"type": "harf_ovi"}]},
+            ),
             (
                 2,
                 StepKind.PRACTICE,
                 {
                     "new_items": letter_items,
-                    "games": [{"type": "harf_ovi"}, {"type": "qaysi_tovush"}, {"type": "harf_chiz"}],
+                    "games": [
+                        {"type": "harf_ovi"},
+                        {"type": "qaysi_tovush"},
+                        {"type": "harf_chiz"},
+                    ],
                 },
             ),
-            (3, StepKind.MASTERY, {"new_items": letter_items, "games": [{"type": "harf_ovi"}]}),
+            (
+                3,
+                StepKind.MASTERY,
+                {"new_items": letter_items, "games": [{"type": "harf_ovi"}]},
+            ),
         ]
         for o, k, cfg in steps1:
-            LessonStep.objects.update_or_create(lesson=lesson1, order=o, defaults={"kind": k, "config_json": cfg})
+            LessonStep.objects.update_or_create(
+                lesson=lesson1, order=o, defaults={"kind": k, "config_json": cfg}
+            )
 
         # 2-dars: so'z qurish (6-7) — qisqa so'zlar harflaridan
-        short = list(Word.objects.filter(language=ru, lemma__in=[w[0] for w in SHORT_WORDS]))
+        short = list(
+            Word.objects.filter(language=ru, lemma__in=[w[0] for w in SHORT_WORDS])
+        )
         word_items = [{"type": "word", "id": str(w.id)} for w in short]
         lesson2, _ = Lesson.objects.get_or_create(
             theme=theme,
             order=2,
-            defaults={"title_uz": "So'z qurish", "title_ru": "Собери слово", "min_age_band": "6-7"},
+            defaults={
+                "title_uz": "So'z qurish",
+                "title_ru": "Собери слово",
+                "min_age_band": "6-7",
+            },
         )
         steps2 = [
-            (1, StepKind.INTRO, {"new_items": word_items, "games": [{"type": "soz_qur"}]}),
-            (2, StepKind.PRACTICE, {"new_items": word_items, "games": [{"type": "soz_qur"}]}),
-            (3, StepKind.MASTERY, {"new_items": word_items, "games": [{"type": "soz_qur"}]}),
+            (
+                1,
+                StepKind.INTRO,
+                {"new_items": word_items, "games": [{"type": "soz_qur"}]},
+            ),
+            (
+                2,
+                StepKind.PRACTICE,
+                {"new_items": word_items, "games": [{"type": "soz_qur"}]},
+            ),
+            (
+                3,
+                StepKind.MASTERY,
+                {"new_items": word_items, "games": [{"type": "soz_qur"}]},
+            ),
         ]
         for o, k, cfg in steps2:
-            LessonStep.objects.update_or_create(lesson=lesson2, order=o, defaults={"kind": k, "config_json": cfg})
+            LessonStep.objects.update_or_create(
+                lesson=lesson2, order=o, defaults={"kind": k, "config_json": cfg}
+            )

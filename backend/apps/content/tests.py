@@ -58,8 +58,12 @@ def test_seed_content_idempotent():
     )
     assert snap1 == snap2, (snap1, snap2)
     assert GameType.objects.count() == 11
-    assert Word.objects.count() == 15  # 6 hayvon + 6 rang + 3 qisqa (so'z qurish, Faza 7)
-    assert Letter.objects.count() == 23  # 1-guruh (8) + mavzu so'zlari harflari (Faza 7)
+    assert (
+        Word.objects.count() == 15
+    )  # 6 hayvon + 6 rang + 3 qisqa (so'z qurish, Faza 7)
+    assert (
+        Letter.objects.count() == 23
+    )  # 1-guruh (8) + mavzu so'zlari harflari (Faza 7)
     assert Lesson.objects.count() == 4  # 2 mavzu darsi + alifbo (harf + so'z qurish)
     assert LessonStep.objects.count() == 12  # 4 dars × 3 qadam
 

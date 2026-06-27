@@ -297,7 +297,9 @@ class GameType(BaseModel):
     key = models.SlugField("kalit", max_length=32, unique=True)
     name_uz = models.CharField("nom (uz)", max_length=64)
     name_ru = models.CharField("nom (ru)", max_length=64, blank=True)
-    skill = models.CharField("ko'nikma", max_length=64, blank=True)  # erkin tavsif (slug)
+    skill = models.CharField(
+        "ko'nikma", max_length=64, blank=True
+    )  # erkin tavsif (slug)
     # SRS o'lchovi: reseptiv (tanib olish) / ekspressiv (ishlab chiqarish) — strength'ni ajratadi
     dimension = models.CharField(
         "o'lcham (SRS)",

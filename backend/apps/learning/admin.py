@@ -22,7 +22,15 @@ class ItemStateAdmin(admin.ModelAdmin):
 
 @admin.register(LearningEvent)
 class LearningEventAdmin(admin.ModelAdmin):
-    list_display = ("event_id", "child", "item_type", "item_id", "game_type", "is_correct", "ts")
+    list_display = (
+        "event_id",
+        "child",
+        "item_type",
+        "item_id",
+        "game_type",
+        "is_correct",
+        "ts",
+    )
     list_filter = ("item_type", "is_correct", "game_type")
     search_fields = ("event_id", "child__display_name", "item_id")
     readonly_fields = ("created_at", "updated_at")

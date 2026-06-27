@@ -19,6 +19,7 @@ def _dimension_for(game_type: str) -> str:
     gt = GameType.objects.filter(key=game_type).only("dimension").first()
     return gt.dimension if gt else RECEPTIVE
 
+
 # Progress (lineer ochilish) ostonalari — YUMSHOQ (bola qamalib qolmasin, §6.3)
 STRENGTH_THRESHOLD = 0.5  # so'z "o'zlashtirilgan" deb hisoblanadi
 DONE_RATIO = 0.6  # mavzu so'zlarining ko'pchiligi (mukammal EMAS)
@@ -34,7 +35,10 @@ def record_event(child, data: dict):
     event_id = data["event_id"]
     existing = LearningEvent.objects.filter(event_id=event_id).first()
     if existing:
-        return existing, False  # IDEMPOTENT (ketma-ket dublikat) — state qayta hisoblanmaydi
+        return (
+            existing,
+            False,
+        )  # IDEMPOTENT (ketma-ket dublikat) — state qayta hisoblanmaydi
 
     try:
         # Savepoint: KONKURENT dublikat (tekshir-keyin-yoz race) → IntegrityError, 500 emas.
@@ -84,7 +88,9 @@ def get_due(child, limit: int = 8, now=None):
     """
     now = now or timezone.now()
     # word + letter (Faza 7): harflar ham due bo'lib qaytadi (takrorlashda)
-    qs = ItemState.objects.filter(child=child, due_at__lte=now).order_by("due_at")[:limit]
+    qs = ItemState.objects.filter(child=child, due_at__lte=now).order_by("due_at")[
+        :limit
+    ]
     return list(qs)
 
 
@@ -137,7 +143,9 @@ def compute_theme_statuses(child) -> dict:
             >= STRENGTH_THRESHOLD
         ]
         done = bool(word_ids) and (len(strong) / len(word_ids) >= DONE_RATIO)
-        statuses[str(theme.id)] = "done" if done else ("started" if seen else "available")
+        statuses[str(theme.id)] = (
+            "done" if done else ("started" if seen else "available")
+        )
         chain_open = done  # lineer: done bo'lmasa keyingilar qulf
 
     return statuses

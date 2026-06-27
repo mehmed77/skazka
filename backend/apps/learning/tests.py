@@ -113,11 +113,15 @@ def test_get_due_returns_due_only(parent):
     due_word = Word.objects.get(lemma="кошка")
     future_word = Word.objects.get(lemma="собака")
     ItemState.objects.create(
-        child=child, item_type="word", item_id=due_word.id,
+        child=child,
+        item_type="word",
+        item_id=due_word.id,
         due_at=timezone.now() - timezone.timedelta(days=1),
     )
     ItemState.objects.create(
-        child=child, item_type="word", item_id=future_word.id,
+        child=child,
+        item_type="word",
+        item_id=future_word.id,
         due_at=timezone.now() + timezone.timedelta(days=5),
     )
     due = get_due(child)
@@ -133,8 +137,14 @@ def test_event_endpoint_idempotent(api, parent):
     child = ChildProfile.objects.create(parent=parent, display_name="A", age_band="6-7")
     word = Word.objects.get(lemma="кошка")
     c = _child_ctx(api, parent, child)
-    payload = {"event_id": str(uuid.uuid4()), "item_type": "word", "item_id": str(word.id),
-               "game_type": "eshit_va_bos", "is_correct": True, "latency_ms": 900}
+    payload = {
+        "event_id": str(uuid.uuid4()),
+        "item_type": "word",
+        "item_id": str(word.id),
+        "game_type": "eshit_va_bos",
+        "is_correct": True,
+        "latency_ms": 900,
+    }
     r1 = c.post("/api/v1/learning/event/", payload, format="json")
     r2 = c.post("/api/v1/learning/event/", payload, format="json")
     assert r1.status_code == 200 and r2.status_code == 200
@@ -148,7 +158,9 @@ def test_session_endpoint_returns_due(api, parent):
     child = ChildProfile.objects.create(parent=parent, display_name="A", age_band="6-7")
     word = Word.objects.get(lemma="кошка")
     ItemState.objects.create(
-        child=child, item_type="word", item_id=word.id,
+        child=child,
+        item_type="word",
+        item_id=word.id,
         due_at=timezone.now() - timezone.timedelta(hours=1),
     )
     r = _child_ctx(api, parent, child).get("/api/v1/learning/session/")
@@ -166,7 +178,9 @@ def test_learning_requires_child_context(api, parent):
 
 @pytest.mark.django_db
 def test_learning_foreign_child_forbidden(api, parent, parent_b):
-    other = ChildProfile.objects.create(parent=parent_b, display_name="O", age_band="6-7")
+    other = ChildProfile.objects.create(
+        parent=parent_b, display_name="O", age_band="6-7"
+    )
     # parent o'z tokeni bilan parent_b ning bolasini da'vo qiladi → 403
     access = RefreshToken.for_user(parent).access_token
     access["parent_id"] = str(parent.id)
@@ -242,12 +256,16 @@ def test_letter_due_in_session(api, parent):
     child = ChildProfile.objects.create(parent=parent, display_name="A", age_band="6-7")
     letter = Letter.objects.get(char="А")
     ItemState.objects.create(
-        child=child, item_type="letter", item_id=letter.id,
+        child=child,
+        item_type="letter",
+        item_id=letter.id,
         due_at=timezone.now() - timedelta(hours=1),
     )
     r = _child_ctx(api, parent, child).get("/api/v1/learning/session/")
     assert r.status_code == 200
-    assert any(d.get("type") == "letter" and d.get("char") == "А" for d in r.data["due"])
+    assert any(
+        d.get("type") == "letter" and d.get("char") == "А" for d in r.data["due"]
+    )
 
 
 @pytest.mark.django_db
@@ -258,8 +276,12 @@ def test_empty_theme_does_not_block_chain(parent):
 
     lang = Language.objects.create(code="xx", name="Test")
     level = Level.objects.create(language=lang, order=1, title_uz="L")
-    empty = ThemeModel.objects.create(level=level, order=1, key="empty", title_uz="Bo'sh")
-    populated = ThemeModel.objects.create(level=level, order=2, key="pop", title_uz="To'la")
+    empty = ThemeModel.objects.create(
+        level=level, order=1, key="empty", title_uz="Bo'sh"
+    )
+    populated = ThemeModel.objects.create(
+        level=level, order=2, key="pop", title_uz="To'la"
+    )
     Word.objects.create(language=lang, lemma="мама", theme=populated)
 
     child = ChildProfile.objects.create(parent=parent, display_name="A", age_band="6-7")
@@ -276,4 +298,8 @@ def test_curriculum_reflects_progress(api, parent):
     assert r.status_code == 200
     # birinchi mavzu darslari "available", progress REAL keladi
     first_theme = r.data["levels"][0]["themes"][0]
-    assert first_theme["lessons"][0]["progress"]["status"] in {"available", "started", "done"}
+    assert first_theme["lessons"][0]["progress"]["status"] in {
+        "available",
+        "started",
+        "done",
+    }

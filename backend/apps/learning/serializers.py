@@ -9,7 +9,9 @@ class EventInputSerializer(serializers.Serializer):
     event_id = serializers.UUIDField()
     item_type = serializers.ChoiceField(choices=ItemType.choices)
     item_id = serializers.UUIDField()
-    game_type = serializers.CharField(max_length=32, required=False, allow_blank=True, default="")
+    game_type = serializers.CharField(
+        max_length=32, required=False, allow_blank=True, default=""
+    )
     is_correct = serializers.BooleanField(required=False, default=False)
     latency_ms = serializers.IntegerField(
         required=False, allow_null=True, min_value=0, default=None

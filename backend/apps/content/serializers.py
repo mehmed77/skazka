@@ -60,7 +60,9 @@ class ResolvedLetterSerializer(serializers.ModelSerializer):
     type = serializers.SerializerMethodField()
     audio_url = serializers.SerializerMethodField()
     mnemonic_image_url = serializers.SerializerMethodField()
-    confusable_ids = serializers.SerializerMethodField()  # harfda hozir yo'q → [] (uniform kontrakt)
+    confusable_ids = (
+        serializers.SerializerMethodField()
+    )  # harfda hozir yo'q → [] (uniform kontrakt)
 
     class Meta:
         model = Letter
@@ -80,7 +82,9 @@ class ResolvedLetterSerializer(serializers.ModelSerializer):
         return "letter"
 
     def get_confusable_ids(self, obj):
-        return []  # Letter modelida confusable_with M2M yo'q (Faza 7); uniform kontrakt uchun []
+        return (
+            []
+        )  # Letter modelida confusable_with M2M yo'q (Faza 7); uniform kontrakt uchun []
 
     def get_audio_url(self, obj):
         return _media_url(obj.audio)
