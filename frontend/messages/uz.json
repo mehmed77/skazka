@@ -75,5 +75,10 @@
     "done": "Ofarin!",
     "again": "Yana",
     "home": "Uyga"
+  },
+  "review": {
+    "title": "Takrorlash",
+    "empty": "Hozircha takrorlash yo'q!",
+    "home": "Uyga"
   }
 }

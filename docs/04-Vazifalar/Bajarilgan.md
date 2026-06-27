@@ -11,6 +11,24 @@ created: 2026-06-26
 > Bog'liq: [[04-Vazifalar/Backlog|📥 Backlog]] · [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[03-Reja/Bosqichlar#Faza 0|🪜 Faza 0]]
 > Tugagan vazifalar shu yerga sana bilan ko'chiriladi (eng yangisi tepada).
 
+## ✅ Faza 6 — Ko'rinmas SRS dvigateli (2026-06-27)
+[[SPEC]] §4 — platformaning ilmiy yadrosi. **Additiv** (DB reset yo'q). Backend + frontend ulanish.
+
+- [x] **`learning` app:** `ItemState` (POLIMORFIK word|letter, FSRS-tayyor + reseptiv/ekspressiv kuch) + `LearningEvent` (`event_id` unique) ✅ 2026-06-27 #modul/srs → [[99-Resurslar/Qaror-Jurnali#ADR-013 — SRS dvigateli: izolyatsiyalangan scheduler + idempotent event + polimorfik ItemState|ADR-013]]
+- [x] **`schedule()` izolyatsiya** (`scheduler.py`): MVP konservativ SM-2-lite (to'g'ri→1,3,7,×2.2; xato→~10daq). Almashtiriladigan — model/event o'zgarmaydi ✅ 2026-06-27 #modul/srs
+- [x] **`record_event` IDEMPOTENT** (`event_id` → dublikat ignore, state qayta o'zgarmaydi) + `get_due` ✅ 2026-06-27 #modul/srs
+- [x] **Endpointlar:** `POST /learning/event/` (idempotent) + `GET /learning/session/` (due) — bola-kontekst ✅ 2026-06-27 #modul/srs
+- [x] **Progress REAL + LINEER:** 1-mavzu ochiq, done(≥60% so'z reseptiv≥0.5 — yumshoq)→keyingisi; curriculum overlay + ETag stamp ✅ 2026-06-27 #modul/srs
+- [x] **Frontend (GamePlayer O'ZGARMADI):** `recordResult` event_id+**outbox→sync** (online listener), `useSessionQueue` due interleave, `IntroView` exposure ✅ 2026-06-27 #modul/games
+- [x] **Takrorlash** (#11) registry plugin + `/review` ReviewPlayer + forest "♻️" tugmasi (due>0) ✅ 2026-06-27 #modul/games
+- [x] pytest **44/44** (12 yangi: schedule, idempotentlik, due, lineer progress, authz) + Playwright (Faza 5 saqlandi) ✅ 2026-06-27
+
+> [!success] Faza 6 qabul mezonlari bajarildi
+> Bola so'z o'rgansa keyingi sessiyalarda kengayuvchi intervalda qaytadi (xato→tezroq); event idempotent
+> (outbox dublikat state buzmaydi); ItemState polimorfik (reseptiv haydaladi, ekspressiv bo'sh); progress
+> REAL+LINEER; takrorlash due'dan; `recordResult` outbox→sync (Faza 10 poydevori), **GamePlayer o'zgarmadi**.
+> Keyingi: **Faza 7** (harf/alifbo mexanikalari — ItemState `letter` polimorfizmini ishlatadi).
+
 ## ✅ Faza 5 — O'yin dvigateli + 3 mexanika (2026-06-27)
 [[SPEC]] §5 + §4.4 — data-driven dvigatel; bola nihoyat so'z o'rgana boshlaydi. **Asosan frontend** (additiv, DB reset yo'q).
 
@@ -139,6 +157,6 @@ API health 200, frontend ochiladi, migratsiyalar o'tadi, Celery worker ulanadi. 
 - [x] Yo'l xaritasi va 11 faza rejalashtirildi ✅ 2026-06-26 #modul/loyiha → [[03-Reja/Yol-Xaritasi|🛣️ Yo'l xaritasi]]
 
 ## 📊 Statistika
-- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) + Faza 4 (**8**) + Faza 5 (**8**) = **73**
-- Joriy bosqich: **Faza 5 tugadi** → Faza 6'ga (SRS + rivoj + Takrorlash o'yini) tayyorgarlik
+- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) + Faza 4 (**8**) + Faza 5 (**8**) + Faza 6 (**8**) = **81**
+- Joriy bosqich: **Faza 6 tugadi** → Faza 7'ga (harf/alifbo mexanikalari) tayyorgarlik
 - Keyingi: [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[04-Vazifalar/Backlog|📥 Backlog]]

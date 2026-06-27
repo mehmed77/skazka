@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { Mishka } from "@/components/Mishka";
 import { childTokenStore } from "@/lib/child";
 import { cn } from "@/lib/cn";
-import { fetchCurriculum } from "@/lib/contentApi";
+import { fetchCurriculum, fetchDue } from "@/lib/contentApi";
 import { useLocale } from "@/lib/locale";
 import type { CurriculumTheme, ThemeStatus } from "@/lib/types";
 import { useAudio } from "@/lib/useAudio";
@@ -33,6 +33,7 @@ function themeStatus(theme: CurriculumTheme): ThemeStatus {
 
 export default function ForestPage() {
   const t = useTranslations("forest");
+  const tr = useTranslations("review");
   const router = useRouter();
   const reduce = useReducedMotion();
   const locale = useLocale((s) => s.locale);
@@ -49,6 +50,16 @@ export default function ForestPage() {
     queryFn: fetchCurriculum,
     enabled: typeof window !== "undefined" && !!childTokenStore.access,
   });
+
+  // Takrorlash uchun muddati kelgan (due) itemlar soni — Faza 6 (SRS)
+  const { data: session } = useQuery({
+    queryKey: ["session-due"],
+    queryFn: fetchDue,
+    enabled: typeof window !== "undefined" && !!childTokenStore.access,
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+  const dueCount = session?.count ?? 0;
 
   useEffect(() => {
     if (data) playCue("enter_map"); // ovozli ko'rsatma (audio-birinchi)
@@ -84,6 +95,21 @@ export default function ForestPage() {
         >
           🌲 {t("title")}
         </button>
+        {/* Takrorlash (SRS) — muddati kelgan so'zlar bo'lsa ko'rinadi (Faza 6) */}
+        {dueCount > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              speakName(tr("title"));
+              router.push("/review");
+            }}
+            aria-label={tr("title")}
+            data-review-cta
+            className="mt-1 flex items-center gap-2 rounded-pill bg-success/20 px-5 py-2 text-lg font-extrabold text-foreground active:scale-95"
+          >
+            ♻️ <span className="text-base">{dueCount}</span>
+          </button>
+        )}
       </header>
 
       {isLoading && (

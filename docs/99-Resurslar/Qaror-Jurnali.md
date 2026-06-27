@@ -30,6 +30,7 @@ created: 2026-06-26
 | [[#ADR-010 — Kontent kontrakti (confusable + config_json v2 + SRS)\|ADR-010]] | Kontent/SRS kontrakti | ✅ qabul qilingan |
 | [[#ADR-011 — Faza 3 xavfsizlik review + public-media xulosasi\|ADR-011]] | Public media + media/API xavfsizligi | ✅ qabul qilingan |
 | [[#ADR-012 — O'yin dvigateli: registry plugin + frontend distraktor\|ADR-012]] | Mexanika registry + §4.4 distraktor joyi | ✅ qabul qilingan |
+| [[#ADR-013 — SRS dvigateli: izolyatsiyalangan scheduler + idempotent event + polimorfik ItemState\|ADR-013]] | SRS yadrosi (Faza 6) | ✅ qabul qilingan |
 
 ---
 
@@ -157,6 +158,47 @@ interfeyslari HOZIR qo'yildi → Faza 6 SRS due/event ulanishi `GamePlayer`ni o'
 **Oqibat.** 3 mexanika plugin sifatida ishlaydi; dars to'liq o'ynaladi (intro→practice→mastery→natija);
 §4.4 distraktor va age_band option_count Playwright bilan tasdiqlandi (12/12). Qarang
 [[06-Modullar/Oyin-Mexanikalari]], [[06-Modullar/SRS-Learning]].
+
+---
+
+## ADR-013 — SRS dvigateli: izolyatsiyalangan scheduler + idempotent event + polimorfik ItemState
+**Holat:** ✅ qabul qilingan · Faza 6 · 2026-06-27
+
+**Kontekst.** Faza 6 — ko'rinmas SRS yadrosi (SPEC §4). Uchta uzoq-muddatli qaror talab qilindi.
+
+**Qaror 1 — `schedule()` IZOLYATSIYALANGAN, almashtiriladigan funksiya.**
+- Model FSRS-TAYYOR maydonlarni saqlaydi (`stability, difficulty, due_at, last_reviewed_at, reps, lapses`).
+- Interval mantig'i BITTA fayl: `apps/learning/scheduler.py::schedule(state, is_correct, latency)`.
+- MVP: KONSERVATIV **SM-2-lite** (to'g'ri → 1,3,7,×2.2 kun; xato → ~10 daq, lapse++). Sabab: haqiqiy
+  bola ma'lumotisiz to'liq FSRS parametrlarini sozlab bo'lmaydi.
+- **Faza 10+:** sozlangan FSRS'ga almashtirish MODEL yoki EVENT yozuvni o'zgartirmaydi — faqat `schedule()` ichi.
+
+**Qaror 2 — Event IDEMPOTENT (`event_id` UUID).**
+- SRS holati event'lardan hisoblanadi. Offline outbox onlayn qaytganda bir xil eventni IKKI marta
+  yuborishi mumkin → state buzilmasligi uchun `LearningEvent.event_id` (client-generated UUID, unique).
+- `record_event`: event_id mavjud bo'lsa → IGNORE (state qayta o'zgarmaydi), 200 qaytadi.
+- Frontend `recordResult`/`recordExposure` har eventga UUID + **outbox→sync** (POST muvaffaqiyatda
+  o'chiradi; tarmoq uzilsa qoladi, `online`'da qayta yuboriladi). Faza 10 (to'liq offline) poydevori.
+
+**Qaror 3 — ItemState POLIMORFIK + reseptiv/ekspressiv ajratilgan.**
+- Yagona `ItemState` model: `item_type` (word|letter) + `item_id`. Letter Faza 7'da SHU modelni ishlatadi.
+- `receptive_strength` / `expressive_strength` ALOHIDA (§4.3). Hozir faqat RESEPTIV haydaladi (Faza 5
+  mexanikalari reseptiv); ekspressiv maydon BO'SH turadi, Faza 7/9 (so'z_qur, aytib_ber) to'ldiradi.
+
+**Boshqa qarorlar.** (a) Progress REAL + LINEER: 1-mavzu ochiq, mavzu "done" (≥60% so'z
+`receptive_strength≥0.5` — YUMSHOQ, bola qamalib qolmasin) → keyingisi ochiladi. Curriculum keshi
+bola-independent struktura; progress per-bola overlay; ETag'ga progress-stamp (304 eskirmasin).
+(b) Takrorlash (#11) — registry plugin (ADR-012), `/review` thin orkestrator, due itemlardan.
+(c) `useSessionQueue`/`recordResult` interfeyslari ortini to'ldirish **GamePlayer'ni o'zgartirmadi**.
+
+**Oqibat.** Bola so'z o'rgansa keyingi sessiyalarda kengayuvchi intervalda qaytadi; xato so'z tezroq.
+Event idempotent (outbox dublikat state buzmaydi). pytest 45/45 (13 yangi), Playwright 14/14; Faza 5
+testlari saqlandi. Qarang [[06-Modullar/SRS-Learning]], [[02-Arxitektura/SRS-Dvigateli]].
+
+**Adversarial review (commit oldidan, 4 o'lcham × tasdiqlash).** 17 topilma → 3 tuzatildi:
+(1) **bo'sh mavzu** (so'z yo'q) lineer zanjirni abadiy qulflar edi → bo'sh mavzu to'smaydi (regressiya testi);
+(2) **konkurent dublikat** event_id → IntegrityError/500 → savepoint + IntegrityError ushlandi (idempotent 200);
+(3) intro exposure `last_result`ni noto'g'ri "tuzatardi" → faqat retrieval'da yangilanadi.
 
 **Adversarial review (commit'dan oldin, 4 o'lcham × tasdiqlash — Faza 1/3 uslubi).** 25 topilma →
 5 tasdiqlandi va tuzatildi: (1) bo'sh `games[]` play-step → boshi-berk (GamePlayer skip effekti

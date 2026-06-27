@@ -3,6 +3,8 @@
 Bola-kontekst token (`enter` chiqargan) `active_child_id` claim'iga tayanadi.
 """
 
+import copy
+
 from django.core.cache import cache
 from django.http import Http404
 from rest_framework import permissions
@@ -11,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.models import ChildProfile
+from apps.learning.services import compute_theme_statuses, progress_stamp
 
 from .cache import content_version
 from .models import Language, Lesson, Level
@@ -44,7 +47,8 @@ class CurriculumView(APIView):
     def get(self, request):
         child = _active_child(request)
         version = content_version()
-        etag = f'W/"curr-{child.id}-{version}"'
+        # ETag'ga per-bola progress-stamp — progress o'zgarsa 304 eskirgan holatni qaytarmaydi
+        etag = f'W/"curr-{child.id}-{version}-{progress_stamp(child)}"'
         if request.headers.get("If-None-Match") == etag:
             return Response(status=304)
 
@@ -70,6 +74,15 @@ class CurriculumView(APIView):
             ).data
             cache.set(cache_key, levels_data, 3600)
 
+        # Per-bola REAL progress (lineer) — keshlangan strukturaga NUSXA ustiga overlay qilinadi
+        statuses = compute_theme_statuses(child)
+        levels_out = copy.deepcopy(levels_data)
+        for level in levels_out:
+            for theme in level.get("themes", []):
+                st = statuses.get(theme.get("id"), "available")
+                for lesson in theme.get("lessons", []):
+                    lesson["progress"] = {"status": st}
+
         data = {
             "child": {
                 "id": str(child.id),
@@ -77,7 +90,7 @@ class CurriculumView(APIView):
                 "age_band": child.age_band,
             },
             "language": "ru",
-            "levels": levels_data,
+            "levels": levels_out,
         }
         resp = Response(data)
         resp["ETag"] = etag

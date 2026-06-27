@@ -2,7 +2,7 @@
 title: SRS / Learning moduli (yadro)
 type: modul
 tags: [modul/learning, modul/srs, loyiha, prioritet/high]
-status: rejada
+status: bajarildi
 faza: Faza 6
 created: 2026-06-26
 ---
@@ -16,6 +16,14 @@ SPEC §4: platformaning **eng muhim va eng murakkab** qismi — **ko'rinmas SRS*
 > [!abstract] YADRO modul
 > Bu modul boshqa hamma o'yinning haydovchisi: kontent qaysi so'zni, qachon ko'rsatishini
 > shu yer hal qiladi. Algoritm tafsiloti → [[02-Arxitektura/SRS-Dvigateli]].
+
+> [!success] Bajarildi (Faza 6 MVP — 2026-06-27 · [[99-Resurslar/Qaror-Jurnali#ADR-013 — SRS dvigateli: izolyatsiyalangan scheduler + idempotent event + polimorfik ItemState|ADR-013]])
+> `apps/learning`: **ItemState** (polimorfik word|letter, FSRS-tayyor + reseptiv/ekspressiv kuch) +
+> **LearningEvent** (`event_id` idempotentlik). **`scheduler.schedule()`** izolyatsiya (MVP SM-2-lite,
+> almashtiriladigan). `record_event` (idempotent) + `get_due`. Endpointlar: `POST /learning/event/`,
+> `GET /learning/session/`. **Progress REAL+LINEER** (curriculum overlay + ETag stamp). Frontend:
+> `recordResult` outbox→sync, `useSessionQueue` due interleave, Takrorlash plugin. pytest 44/44.
+> Qolgan: to'liq FSRS sozlash (Faza 10), ekspressiv haydash (Faza 7/9), SessionLog (keyin).
 
 > [!note] Faza 5'da frontend kontrakti QO'YILDI (ADR-010 / [[99-Resurslar/Qaror-Jurnali#ADR-012 — O'yin dvigateli: registry plugin + frontend distraktor|ADR-012]])
 > O'yin dvigateli (Faza 5) Faza 6 ulanishini kutib quyidagi interfeyslarni allaqachon chaqiradi —

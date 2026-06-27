@@ -70,19 +70,17 @@ test("xato javob → JAZO YO'Q, o'sha topshiriq qoladi (qayta imkon)", async ({ 
   await expect(game).toHaveAttribute("data-target", target!);
 });
 
-test("onResult lokal yoziladi (Faza 6 ulanishi uchun interfeys)", async ({ page }) => {
+test("onResult → POST /learning/event/ (idempotent outbox sync, Faza 6)", async ({ page }) => {
   await startHayvonlar(page);
   const game = page.locator('[data-game="eshit_va_bos"]');
   await expect(game).toBeVisible();
   const target = await game.getAttribute("data-target");
-  await page.locator(`[data-option="${target}"]`).click();
-  await page.waitForTimeout(300);
-  const outbox = await page.evaluate(() =>
-    JSON.parse(localStorage.getItem("skazka_learning_outbox") || "[]")
-  );
-  expect(outbox.length).toBeGreaterThan(0);
-  expect(outbox[0]).toHaveProperty("game_type", "eshit_va_bos");
-  expect(outbox[0]).toHaveProperty("is_correct");
-  expect(outbox[0]).toHaveProperty("latency_ms");
-  expect(outbox[0]).toHaveProperty("hint_used");
+  // javob → event backend'ga yuboriladi (outbox sync)
+  const [resp] = await Promise.all([
+    page.waitForResponse(
+      (r) => r.url().includes("/learning/event/") && r.request().method() === "POST"
+    ),
+    page.locator(`[data-option="${target}"]`).click(),
+  ]);
+  expect(resp.status()).toBe(200);
 });

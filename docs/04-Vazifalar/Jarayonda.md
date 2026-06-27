@@ -13,20 +13,20 @@ created: 2026-06-26
 > bu yerga ko'chiriladi, tugaganda `[x]` qilinib [[04-Vazifalar/Bajarilgan|Bajarilgan]]'ga o'tadi.
 
 > [!info] Hozirgi holat
-> **Faza 0, 1, 2, 2.5, 3, 4, 5** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
-> Hozir taxta **bo'sh**: Faza 6'ga tayyorgarlik.
+> **Faza 0, 1, 2, 2.5, 3, 4, 5, 6** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
+> Hozir taxta **bo'sh**: Faza 7'ga tayyorgarlik.
 
-## 🟡 Faza 6 ga tayyorgarlik
-Faza 6 ([[SPEC]] §4) — SRS (FSRS-lite) + rivoj + Takrorlash o'yini. Boshlashdan oldin:
+## 🟡 Faza 7 ga tayyorgarlik
+Faza 7 ([[SPEC]] §5) — Harf/alifbo mexanikalari (harf_ovi, harf_chiz, qaysi_tovush, so'z_qur). Boshlashdan oldin:
 
-- [ ] **Backend:** `LearningEvent` qabul (`POST /learning/event/`, bola-kontekst, idempotent) + SRS holati (`ItemState`) #modul/srs → [[06-Modullar/SRS-Learning|🔁 SRS]]
-- [ ] **`get_due` / session navbat:** due+new interleave; `/curriculum` `progress.status` REAL (locked/started/done) #modul/srs
-- [ ] **Frontend ulanish (GamePlayer O'ZGARMAYDI — ADR-010):** `recordResult` → `POST /learning/event/` (outbox sync); `buildSessionQueue` due so'zlarni oladi #modul/games
-- [ ] Takrorlash o'yini (mexanika #11 — aralash due) registry plugin sifatida #modul/games
+- [ ] **Letter kontenti** seed + `/lesson` resolve (ResolvedLetterSerializer allaqachon bor) #modul/content → [[06-Modullar/Kontent]]
+- [ ] **Harf mexanikalari = registry plugin** (ADR-012): harf_ovi, qaysi_tovush (reseptiv) + harf_chiz (motor), so'z_qur (ekspressiv) #modul/games → [[06-Modullar/Oyin-Mexanikalari|🎮 O'yinlar]]
+- [ ] **SRS `letter` polimorfizmi:** `ItemState`/`recordResult` `item_type="letter"` (model TAYYOR — ADR-013); **ekspressiv_strength** so'z_qur'da haydaladi #modul/srs → [[06-Modullar/SRS-Learning]]
 
 > [!tip] Pull nomzodlari (WIP ≤ 3)
-> 1. Backend SRS (`ItemState` + FSRS-lite `get_due` + `LearningEvent` endpoint) `#prioritet/high`
-> 2. Frontend ulanish: outbox→event sync + `buildSessionQueue(due)` + REAL progress `#prioritet/high`
+> 1. Letter seed + lesson resolve + harf reseptiv mexanikalari (harf_ovi, qaysi_tovush) `#prioritet/high`
+> 2. harf_chiz (motor — chizish) + so'z_qur (bo'g'in/harfdan so'z, ekspressiv) `#prioritet/high`
+> 3. SRS letter polimorfizmi + ekspressiv_strength haydash `#prioritet/medium`
 > 3. Rivoj/progress ko'rsatish (xaritada status) + Takrorlash o'yini plugin `#prioritet/medium`
 
 ## ⛔ Bloklangan (Blocked)

@@ -18,6 +18,7 @@ REST_FRAMEWORK = {
         "profiles": "6000/hour",
         "pin_entry": "1000/min",
         "content": "6000/min",
+        "learning": "60000/min",
     },
 }
 

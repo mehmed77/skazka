@@ -144,6 +144,7 @@ REST_FRAMEWORK = {
         "profiles": "120/hour",
         "pin_entry": "5/min",  # PIN brute-force himoyasi (enter)
         "content": "240/min",  # curriculum/lesson o'qish (saxiy — har dars yuklashda)
+        "learning": "600/min",  # SRS event (har javob) + sessiya navbati — o'yin davomida tez-tez
     },
 }
 

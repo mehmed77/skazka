@@ -3,6 +3,7 @@
 import axios from "axios";
 
 import { childTokenStore } from "./child";
+import type { ResolvedItem } from "./games/types";
 import type { Curriculum } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1";
@@ -32,3 +33,11 @@ export const fetchCurriculum = async (): Promise<Curriculum> =>
 
 export const fetchLesson = async (id: string) =>
   (await contentApi.get(`/lesson/${id}/`)).data;
+
+// Faza 6 — SRS: muddati kelgan (due) itemlar + idempotent event yozish
+export const fetchDue = async (): Promise<{ due: ResolvedItem[]; count: number }> =>
+  (await contentApi.get("/learning/session/")).data;
+
+export const postEvent = async (ev: Record<string, unknown>): Promise<void> => {
+  await contentApi.post("/learning/event/", ev);
+};

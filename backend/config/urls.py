@@ -41,6 +41,7 @@ api_v1 = [
     path("auth/", include("apps.accounts.urls")),
     *_profiles_router.urls,
     path("", include("apps.content.urls")),
+    path("", include("apps.learning.urls")),
 ]
 
 urlpatterns = [
