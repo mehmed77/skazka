@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.models import ChildProfile
-from apps.content.models import Word
-from apps.content.serializers import ResolvedWordSerializer
+from apps.content.models import Letter, Word
+from apps.content.serializers import ResolvedLetterSerializer, ResolvedWordSerializer
 
 from .serializers import EventInputSerializer
 from .services import get_due, record_event
@@ -54,8 +54,16 @@ class SessionView(APIView):
     def get(self, request):
         child = _active_child(request)
         states = get_due(child, limit=8)
-        ids = [s.item_id for s in states]
-        words = {str(w.id): w for w in Word.objects.filter(id__in=ids)}
-        ordered = [words[str(i)] for i in ids if str(i) in words]  # due tartibini saqlaydi
-        due = ResolvedWordSerializer(ordered, many=True, context={"request": request}).data
+        word_ids = [s.item_id for s in states if s.item_type == "word"]
+        letter_ids = [s.item_id for s in states if s.item_type == "letter"]
+        words = {str(w.id): w for w in Word.objects.filter(id__in=word_ids)}
+        letters = {str(ltr.id): ltr for ltr in Letter.objects.filter(id__in=letter_ids)}
+        ctx = {"request": request}
+        due = []
+        for s in states:  # due tartibini saqlaydi (aralash word+letter)
+            key = str(s.item_id)
+            if s.item_type == "word" and key in words:
+                due.append(ResolvedWordSerializer(words[key], context=ctx).data)
+            elif s.item_type == "letter" and key in letters:
+                due.append(ResolvedLetterSerializer(letters[key], context=ctx).data)
         return Response({"due": due, "count": len(due)})

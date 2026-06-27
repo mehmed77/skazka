@@ -23,7 +23,9 @@ SPEC §4: platformaning **eng muhim va eng murakkab** qismi — **ko'rinmas SRS*
 > almashtiriladigan). `record_event` (idempotent) + `get_due`. Endpointlar: `POST /learning/event/`,
 > `GET /learning/session/`. **Progress REAL+LINEER** (curriculum overlay + ETag stamp). Frontend:
 > `recordResult` outbox→sync, `useSessionQueue` due interleave, Takrorlash plugin. pytest 44/44.
-> Qolgan: to'liq FSRS sozlash (Faza 10), ekspressiv haydash (Faza 7/9), SessionLog (keyin).
+> **Faza 7:** ekspressiv strength ISHGA TUSHDI — `schedule(state, correct, latency, dimension)`;
+> so'z_qur/harf_chiz → expressive, harf_ovi/qaysi_tovush → receptive (`GameType.dimension`, [[99-Resurslar/Qaror-Jurnali#ADR-014 — Harf mexanikalari: acceptsItemTypes + schedule(dimension) + yumshoq tracing|ADR-014]]).
+> Letterlar polimorfik ItemState'ga kiradi (due+takrorlash). Qolgan: to'liq FSRS sozlash (Faza 10), SessionLog (keyin).
 
 > [!note] Faza 5'da frontend kontrakti QO'YILDI (ADR-010 / [[99-Resurslar/Qaror-Jurnali#ADR-012 — O'yin dvigateli: registry plugin + frontend distraktor|ADR-012]])
 > O'yin dvigateli (Faza 5) Faza 6 ulanishini kutib quyidagi interfeyslarni allaqachon chaqiradi —

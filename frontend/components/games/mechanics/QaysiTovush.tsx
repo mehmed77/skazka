@@ -11,11 +11,12 @@ import { registerMechanic } from "@/lib/games/registry";
 import { itemLabel, type ItemType, type MechanicProps, type ResolvedItem } from "@/lib/games/types";
 import { useAudio } from "@/lib/useAudio";
 
-const ACCEPTS: ItemType[] = ["word"]; // rasm kerak → faqat so'z (letter-due tashlanadi)
+const ACCEPTS: ItemType[] = ["letter"];
 
-// «Слушай и нажми» — audio yangraydi, bola to'g'ri rasmni bosadi. Distraktor §4.4.
-function EshitVaBos({ items: rawItems, pool, spec, ageBand, onResult, onDone }: MechanicProps) {
-  const { speakName } = useAudio();
+// «Какой звук?» (RESEPTIV, fonetika) — tovush yangraydi → bola to'g'ri harfni tanlaydi.
+// Rus FONETIK afzalligi (1 harf ≈ 1 tovush) — shuni o'rgatadi.
+function QaysiTovush({ items: rawItems, pool, spec, ageBand, onResult, onDone }: MechanicProps) {
+  const { speak, speakName } = useAudio();
   const { confetti, mishka, fire } = useGameFeedback();
   const items = useMemo(() => rawItems.filter((i) => (ACCEPTS as string[]).includes(i.type)), [rawItems]);
   const [round, setRound] = useState(0);
@@ -25,18 +26,18 @@ function EshitVaBos({ items: rawItems, pool, spec, ageBand, onResult, onDone }: 
   const target = items[round] ?? null;
   const optionCount = optionCountForAge(ageBand, (spec.schema?.option_count as number[]) ?? [2, 4]);
   const options = useMemo(
-    () =>
-      target
-        ? buildOptions(target, pool, optionCount, spec.distractors?.exclude_confusable ?? true)
-        : [],
+    () => (target ? buildOptions(target, pool, optionCount, true) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [target?.id, optionCount]
   );
 
+  // tovushni yangratish: jonli audio bo'lsa o'shani, bo'lmasa harf nomini (TTS)
+  const playSound = (it: ResolvedItem) => speakName(itemLabel(it), it.audio_url);
+
   useEffect(() => {
     if (target) {
       startRef.current = Date.now();
-      speakName(itemLabel(target), target.audio_url);
+      playSound(target);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target?.id]);
@@ -52,6 +53,7 @@ function EshitVaBos({ items: rawItems, pool, spec, ageBand, onResult, onDone }: 
     if (locked) return;
     const correct = opt.id === target.id;
     fire(correct);
+    if (correct) speak(itemLabel(opt), "ru-RU"); // tanlangan harf nomi
     onResult({
       itemId: target.id,
       itemType: target.type,
@@ -66,23 +68,22 @@ function EshitVaBos({ items: rawItems, pool, spec, ageBand, onResult, onDone }: 
         setRound((r) => r + 1);
       }, 1300);
     }
-    // xato → JAZO YO'Q, qayta urinish (round o'zgarmaydi)
   };
 
   return (
     <div
       className="flex flex-col items-center gap-6 p-6"
-      data-game="eshit_va_bos"
-      data-target={target.lemma}
+      data-game="qaysi_tovush"
+      data-target={itemLabel(target)}
     >
       <Mishka state={mishka} size="md" />
       <button
         type="button"
-        onClick={() => speakName(itemLabel(target), target.audio_url)}
-        aria-label="Qayta eshitish"
-        className="rounded-pill bg-accent/15 px-7 py-4 text-4xl active:scale-95"
+        onClick={() => playSound(target)}
+        aria-label="Tovushni qayta eshitish"
+        className="rounded-pill bg-accent/15 px-7 py-4 text-3xl active:scale-95"
       >
-        🔊
+        🔉 ?
       </button>
       <div className="grid grid-cols-2 gap-4">
         {options.map((opt) => (
@@ -91,8 +92,8 @@ function EshitVaBos({ items: rawItems, pool, spec, ageBand, onResult, onDone }: 
             type="button"
             onClick={() => pick(opt)}
             disabled={locked}
-            data-option={opt.lemma}
-            aria-label={opt.lemma}
+            data-option={itemLabel(opt)}
+            aria-label={itemLabel(opt)}
             className="flex h-28 w-28 items-center justify-center rounded-blob bg-card shadow-soft ring-4 ring-transparent transition active:scale-95 hover:ring-brand-300"
           >
             <WordVisual item={opt} size="md" />
@@ -104,5 +105,5 @@ function EshitVaBos({ items: rawItems, pool, spec, ageBand, onResult, onDone }: 
   );
 }
 
-registerMechanic("eshit_va_bos", EshitVaBos, ACCEPTS);
-export default EshitVaBos;
+registerMechanic("qaysi_tovush", QaysiTovush, ACCEPTS);
+export default QaysiTovush;

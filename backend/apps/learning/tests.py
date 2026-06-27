@@ -9,7 +9,7 @@ from django.utils import timezone
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.accounts.models import ChildProfile
-from apps.content.models import Theme, Word
+from apps.content.models import Letter, Theme, Word
 from apps.learning.models import ItemState, LearningEvent
 from apps.learning.scheduler import schedule
 from apps.learning.services import compute_theme_statuses, get_due, record_event
@@ -197,6 +197,57 @@ def test_progress_linear_unlock(parent):
     s1 = compute_theme_statuses(child)
     assert s1[str(t1.id)] == "done"
     assert s1[str(t2.id)] == "available"  # keyingisi ochildi
+
+
+# ── Faza 7: dimension (reseptiv/ekspressiv) + letter ─────────────────────
+@pytest.mark.django_db
+def test_expressive_dimension_drives_expressive_strength(parent):
+    """soz_qur (EKSPRESSIV) → expressive_strength oshadi, receptive 0 qoladi."""
+    call_command("seed_content")
+    child = ChildProfile.objects.create(parent=parent, display_name="A", age_band="6-7")
+    word = Word.objects.get(lemma="кот")
+    record_event(child, _ev(child, word, correct=True, game="soz_qur"))
+    st = ItemState.objects.get(child=child, item_id=word.id)
+    assert st.expressive_strength > 0
+    assert st.receptive_strength == 0.0
+
+
+@pytest.mark.django_db
+def test_receptive_dimension_for_letter(parent):
+    """harf_ovi (RESEPTIV) + letter → receptive_strength oshadi, expressive 0."""
+    call_command("seed_content")
+    child = ChildProfile.objects.create(parent=parent, display_name="A", age_band="6-7")
+    letter = Letter.objects.get(char="А")
+    record_event(
+        child,
+        {
+            "event_id": uuid.uuid4(),
+            "item_type": "letter",
+            "item_id": letter.id,
+            "game_type": "harf_ovi",
+            "is_correct": True,
+            "latency_ms": 900,
+            "hint_used": False,
+        },
+    )
+    st = ItemState.objects.get(child=child, item_type="letter", item_id=letter.id)
+    assert st.receptive_strength > 0
+    assert st.expressive_strength == 0.0
+
+
+@pytest.mark.django_db
+def test_letter_due_in_session(api, parent):
+    """Harf due bo'lsa sessiya navbatida (takrorlash) qaytadi — polimorfik."""
+    call_command("seed_content")
+    child = ChildProfile.objects.create(parent=parent, display_name="A", age_band="6-7")
+    letter = Letter.objects.get(char="А")
+    ItemState.objects.create(
+        child=child, item_type="letter", item_id=letter.id,
+        due_at=timezone.now() - timedelta(hours=1),
+    )
+    r = _child_ctx(api, parent, child).get("/api/v1/learning/session/")
+    assert r.status_code == 200
+    assert any(d.get("type") == "letter" and d.get("char") == "А" for d in r.data["due"])
 
 
 @pytest.mark.django_db

@@ -4,7 +4,7 @@ import type { AgeBand } from "@/lib/types";
 export type ResolvedItem = {
   id: string;
   type: string; // "word" | "letter"
-  lemma: string;
+  lemma?: string; // so'z uchun (harfda yo'q)
   translit?: string;
   stress_index?: number | null;
   l1_translation_json?: Record<string, string>;
@@ -43,3 +43,9 @@ export type MechanicProps = {
 };
 
 export type MechanicComponent = React.ComponentType<MechanicProps>;
+
+export type ItemType = "word" | "letter";
+
+// Item yorlig'i: harf uchun `char`, so'z uchun `lemma` — audio/aria/data-option uchun yagona manba.
+export const itemLabel = (it: ResolvedItem): string =>
+  it.type === "letter" ? it.char ?? "" : it.lemma ?? "";

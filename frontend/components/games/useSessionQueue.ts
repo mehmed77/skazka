@@ -21,6 +21,8 @@ export function useSessionQueue(newItems: ResolvedItem[], depKey: string): Resol
     refetchOnWindowFocus: false,
   });
   const due = data?.due ?? [];
+  // due TARKIBI o'zgarsa qayta hisob (faqat uzunlik emas — bir xil uzunlikli boshqa to'plam ham)
+  const dueKey = due.map((d) => d.id).join(",");
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => buildSessionQueue(newItems, due), [depKey, due.length]);
+  return useMemo(() => buildSessionQueue(newItems, due), [depKey, dueKey]);
 }

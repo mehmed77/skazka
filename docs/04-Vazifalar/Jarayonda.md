@@ -13,20 +13,20 @@ created: 2026-06-26
 > bu yerga ko'chiriladi, tugaganda `[x]` qilinib [[04-Vazifalar/Bajarilgan|Bajarilgan]]'ga o'tadi.
 
 > [!info] Hozirgi holat
-> **Faza 0, 1, 2, 2.5, 3, 4, 5, 6** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
-> Hozir taxta **bo'sh**: Faza 7'ga tayyorgarlik.
+> **Faza 0, 1, 2, 2.5, 3, 4, 5, 6, 7** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
+> Hozir taxta **bo'sh**: Faza 8 (geymifikatsiya) yoki Faza 9 (ertak/qo'shiq) tayyorgarlik.
 
-## 🟡 Faza 7 ga tayyorgarlik
-Faza 7 ([[SPEC]] §5) — Harf/alifbo mexanikalari (harf_ovi, harf_chiz, qaysi_tovush, so'z_qur). Boshlashdan oldin:
+## 🟡 Keyingi faza tayyorgarligi
+**Faza 8** ([[SPEC]] §6) — Geymifikatsiya (mukofot/yutuq/ketma-ketlik) yoki **Faza 9** ([[SPEC]] §5 #8–9) —
+sehrli_ertak (TPRS, tanlovli) + qo'shiq (ko'p sezgili). Ikkalasi ham registry plugin (ADR-012/014).
 
-- [ ] **Letter kontenti** seed + `/lesson` resolve (ResolvedLetterSerializer allaqachon bor) #modul/content → [[06-Modullar/Kontent]]
-- [ ] **Harf mexanikalari = registry plugin** (ADR-012): harf_ovi, qaysi_tovush (reseptiv) + harf_chiz (motor), so'z_qur (ekspressiv) #modul/games → [[06-Modullar/Oyin-Mexanikalari|🎮 O'yinlar]]
-- [ ] **SRS `letter` polimorfizmi:** `ItemState`/`recordResult` `item_type="letter"` (model TAYYOR — ADR-013); **ekspressiv_strength** so'z_qur'da haydaladi #modul/srs → [[06-Modullar/SRS-Learning]]
+- [ ] **Faza 8:** `gamification` app (Reward/Achievement/Streak); xaritada yulduz/medal; bola zonasiga mos (matnsiz) #modul/gamification → [[06-Modullar/Geymifikatsiya]]
+- [ ] **Faza 9:** sehrli_ertak (kontentdan tanlovli yo'l) + qo'shiq (audio+so'z highlight) mexanikalari — registry plugin #modul/games → [[06-Modullar/Oyin-Mexanikalari]]
+- [ ] Ekspressiv #10 (aytib_ber, ASR) — Faza 11 (ovoz tanish infra)
 
 > [!tip] Pull nomzodlari (WIP ≤ 3)
-> 1. Letter seed + lesson resolve + harf reseptiv mexanikalari (harf_ovi, qaysi_tovush) `#prioritet/high`
-> 2. harf_chiz (motor — chizish) + so'z_qur (bo'g'in/harfdan so'z, ekspressiv) `#prioritet/high`
-> 3. SRS letter polimorfizmi + ekspressiv_strength haydash `#prioritet/medium`
+> 1. Faza 8 geymifikatsiya: backend model + xarita ko'rsatkichlari (matnsiz, bola zonasi) `#prioritet/high`
+> 2. Faza 9 sehrli_ertak + qo'shiq mexanikalari (registry plugin, Story/Song kontenti) `#prioritet/medium`
 > 3. Rivoj/progress ko'rsatish (xaritada status) + Takrorlash o'yini plugin `#prioritet/medium`
 
 ## ⛔ Bloklangan (Blocked)

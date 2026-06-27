@@ -11,10 +11,11 @@ import { registerMechanic } from "@/lib/games/registry";
 import { itemLabel, type ItemType, type MechanicProps, type ResolvedItem } from "@/lib/games/types";
 import { useAudio } from "@/lib/useAudio";
 
-const ACCEPTS: ItemType[] = ["word"]; // rasm kerak → faqat so'z (letter-due tashlanadi)
+const ACCEPTS: ItemType[] = ["letter"];
 
-// «Слушай и нажми» — audio yangraydi, bola to'g'ri rasmni bosadi. Distraktor §4.4.
-function EshitVaBos({ items: rawItems, pool, spec, ageBand, onResult, onDone }: MechanicProps) {
+// «Где буква?» (RESEPTIV) — harf nomi yangraydi → bola to'g'ri harfni topadi. Distraktor: boshqa
+// harflar (buildOptions bir xil tur). option_count age_band bo'yicha.
+function HarfOvi({ items: rawItems, pool, spec, ageBand, onResult, onDone }: MechanicProps) {
   const { speakName } = useAudio();
   const { confetti, mishka, fire } = useGameFeedback();
   const items = useMemo(() => rawItems.filter((i) => (ACCEPTS as string[]).includes(i.type)), [rawItems]);
@@ -25,10 +26,7 @@ function EshitVaBos({ items: rawItems, pool, spec, ageBand, onResult, onDone }: 
   const target = items[round] ?? null;
   const optionCount = optionCountForAge(ageBand, (spec.schema?.option_count as number[]) ?? [2, 4]);
   const options = useMemo(
-    () =>
-      target
-        ? buildOptions(target, pool, optionCount, spec.distractors?.exclude_confusable ?? true)
-        : [],
+    () => (target ? buildOptions(target, pool, optionCount, true) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [target?.id, optionCount]
   );
@@ -66,14 +64,13 @@ function EshitVaBos({ items: rawItems, pool, spec, ageBand, onResult, onDone }: 
         setRound((r) => r + 1);
       }, 1300);
     }
-    // xato → JAZO YO'Q, qayta urinish (round o'zgarmaydi)
   };
 
   return (
     <div
       className="flex flex-col items-center gap-6 p-6"
-      data-game="eshit_va_bos"
-      data-target={target.lemma}
+      data-game="harf_ovi"
+      data-target={itemLabel(target)}
     >
       <Mishka state={mishka} size="md" />
       <button
@@ -91,8 +88,8 @@ function EshitVaBos({ items: rawItems, pool, spec, ageBand, onResult, onDone }: 
             type="button"
             onClick={() => pick(opt)}
             disabled={locked}
-            data-option={opt.lemma}
-            aria-label={opt.lemma}
+            data-option={itemLabel(opt)}
+            aria-label={itemLabel(opt)}
             className="flex h-28 w-28 items-center justify-center rounded-blob bg-card shadow-soft ring-4 ring-transparent transition active:scale-95 hover:ring-brand-300"
           >
             <WordVisual item={opt} size="md" />
@@ -104,5 +101,5 @@ function EshitVaBos({ items: rawItems, pool, spec, ageBand, onResult, onDone }: 
   );
 }
 
-registerMechanic("eshit_va_bos", EshitVaBos, ACCEPTS);
-export default EshitVaBos;
+registerMechanic("harf_ovi", HarfOvi, ACCEPTS);
+export default HarfOvi;

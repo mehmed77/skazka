@@ -9,7 +9,9 @@ function avoidConfusableAdjacency(items: ResolvedItem[]): ResolvedItem[] {
   while (rest.length) {
     const prev = out[out.length - 1];
     let idx = rest.findIndex(
-      (it) => !prev || !(prev.confusable_ids.includes(it.id) || it.confusable_ids.includes(prev.id)),
+      (it) =>
+        !prev ||
+        !((prev.confusable_ids ?? []).includes(it.id) || (it.confusable_ids ?? []).includes(prev.id)),
     );
     if (idx === -1) idx = 0; // iloji bo'lmasa — boribir qo'shamiz (graceful)
     out.push(rest.splice(idx, 1)[0]);

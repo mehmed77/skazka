@@ -4,7 +4,7 @@ import { wordEmoji } from "@/lib/wordPlaceholder";
 
 const SIZE = { sm: "text-5xl", md: "text-7xl", lg: "text-8xl" };
 
-// So'z vizuali: real image_url bo'lsa rasm; bo'lmasa emoji placeholder (asset slot).
+// Item vizuali: HARF → katta `char`; so'z → real image_url (rasm) yoki emoji placeholder (asset slot).
 export function WordVisual({
   item,
   size = "md",
@@ -14,6 +14,17 @@ export function WordVisual({
   size?: "sm" | "md" | "lg";
   className?: string;
 }) {
+  if (item.type === "letter") {
+    return (
+      <span
+        role="img"
+        aria-label={item.char ?? ""}
+        className={cn("font-extrabold leading-none text-brand-700", SIZE[size], className)}
+      >
+        {item.char}
+      </span>
+    );
+  }
   if (item.image_url) {
     return (
       // eslint-disable-next-line @next/next/no-img-element -- real rasm slot; next/image (MinIO domeni) Faza 10
@@ -25,8 +36,8 @@ export function WordVisual({
     );
   }
   return (
-    <span role="img" aria-label={item.lemma} className={cn(SIZE[size], className)}>
-      {wordEmoji(item.lemma)}
+    <span role="img" aria-label={item.lemma ?? ""} className={cn(SIZE[size], className)}>
+      {wordEmoji(item.lemma ?? "")}
     </span>
   );
 }

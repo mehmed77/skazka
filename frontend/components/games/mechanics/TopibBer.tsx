@@ -8,13 +8,16 @@ import { WordVisual } from "@/components/games/WordVisual";
 import { useGameFeedback } from "@/components/games/useGameFeedback";
 import { shuffle } from "@/lib/games/distractors";
 import { registerMechanic } from "@/lib/games/registry";
-import type { MechanicProps, ResolvedItem } from "@/lib/games/types";
+import type { ItemType, MechanicProps, ResolvedItem } from "@/lib/games/types";
 import { useAudio } from "@/lib/useAudio";
 
+const ACCEPTS: ItemType[] = ["word"]; // sahna obyektlari → faqat so'z
+
 // «Покажи …» (TPR) — sahnada bir nechta obyekt; Mishka navbat bilan so'raydi, bola topadi.
-function TopibBer({ items, onResult, onDone }: MechanicProps) {
+function TopibBer({ items: rawItems, onResult, onDone }: MechanicProps) {
   const { speak } = useAudio();
   const { confetti, mishka, fire } = useGameFeedback();
+  const items = useMemo(() => rawItems.filter((i) => (ACCEPTS as string[]).includes(i.type)), [rawItems]);
   const scene = useMemo(() => items.slice(0, Math.min(items.length, 4)), [items]);
   // so'rash tartibi sahnadagi obyektlardan (aralash)
   const order = useMemo(() => shuffle(scene), [scene]);
@@ -96,5 +99,5 @@ function TopibBer({ items, onResult, onDone }: MechanicProps) {
   );
 }
 
-registerMechanic("topib_ber", TopibBer);
+registerMechanic("topib_ber", TopibBer, ACCEPTS);
 export default TopibBer;

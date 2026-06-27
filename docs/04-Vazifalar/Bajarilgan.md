@@ -11,6 +11,24 @@ created: 2026-06-26
 > Bog'liq: [[04-Vazifalar/Backlog|📥 Backlog]] · [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[03-Reja/Bosqichlar#Faza 0|🪜 Faza 0]]
 > Tugagan vazifalar shu yerga sana bilan ko'chiriladi (eng yangisi tepada).
 
+## ✅ Faza 7 — Trek A: kirill alifbo/fonetika mexanikalari (2026-06-27)
+[[SPEC]] §3 Trek A + §5 (#4–7). **Additiv.** Ekspressiv strength SHU fazada ishga tushdi.
+
+- [x] **Letter seed:** 1-guruh (8 harf) + mavzu so'zlari harflari (23 jami); qisqa so'zlar (кот/сон/нос) + **alifbo darslari** (harf + so'z qurish) ✅ 2026-06-27 #modul/content
+- [x] **`GameType.dimension`** (receptive|expressive) + **`schedule(dimension)`** — ekspressiv strength ishga tushdi; izolyatsiya parametr orqali ✅ 2026-06-27 #modul/srs → [[99-Resurslar/Qaror-Jurnali#ADR-014 — Harf mexanikalari: acceptsItemTypes + schedule(dimension) + yumshoq tracing|ADR-014]]
+- [x] **4 mexanika (registry plugin):** harf_ovi, qaysi_tovush (reseptiv) · harf_chiz (ekspressiv, Canvas yumshoq) · so'z_qur (ekspressiv, harflardan) ✅ 2026-06-27 #modul/games
+- [x] **`acceptsItemTypes`** (mexanika-darajasi routing): get_due aralash (word+letter); buildOptions bir xil tur; takrorlash aralashni "bepul" to'g'ri qiladi ✅ 2026-06-27 #modul/games
+- [x] **harf_chiz** yumshoq baholash (kontur qoplanishi ostonasi — bitta konstanta); touch-birlamchi + responsive ✅ 2026-06-27 #modul/games
+- [x] Letterlar SRS'ga kiradi (polimorfik) + takrorlashga; **GamePlayer O'ZGARMADI** ✅ 2026-06-27 #modul/srs
+- [x] Murakkab harflar (ж,ц,ч,ш,щ,ы,ъ,ь) faqat record (drill keyin — §3); mnemonik = asset slot ✅ 2026-06-27
+- [x] pytest **48/48** + Playwright (alifbo, so'z_qur, harf_chiz; Faza 5/6 saqlandi) ✅ 2026-06-27
+
+> [!success] Faza 7 qabul mezonlari bajarildi
+> Bola harf chizadi (yumshoq), tovushni harf bilan bog'laydi, harf topadi, so'z quradi; 4 mexanika =
+> registry plugin (GamePlayer o'zgarmadi); ekspressiv (so'z_qur/harf_chiz) ↔ reseptiv (harf_ovi/
+> qaysi_tovush) strength ajratilgan; letterlar SRS+takrorlashda. Keyingi: **Faza 8** (geymifikatsiya) yoki
+> **Faza 9** (ertak/qo'shiq mexanikalari).
+
 ## ✅ Faza 6 — Ko'rinmas SRS dvigateli (2026-06-27)
 [[SPEC]] §4 — platformaning ilmiy yadrosi. **Additiv** (DB reset yo'q). Backend + frontend ulanish.
 
@@ -157,6 +175,6 @@ API health 200, frontend ochiladi, migratsiyalar o'tadi, Celery worker ulanadi. 
 - [x] Yo'l xaritasi va 11 faza rejalashtirildi ✅ 2026-06-26 #modul/loyiha → [[03-Reja/Yol-Xaritasi|🛣️ Yo'l xaritasi]]
 
 ## 📊 Statistika
-- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) + Faza 4 (**8**) + Faza 5 (**8**) + Faza 6 (**8**) = **81**
-- Joriy bosqich: **Faza 6 tugadi** → Faza 7'ga (harf/alifbo mexanikalari) tayyorgarlik
+- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) + Faza 4 (**8**) + Faza 5 (**8**) + Faza 6 (**8**) + Faza 7 (**8**) = **89**
+- Joriy bosqich: **Faza 7 tugadi** → Faza 8 (geymifikatsiya) / Faza 9 (ertak/qo'shiq) tayyorgarlik
 - Keyingi: [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[04-Vazifalar/Backlog|📥 Backlog]]

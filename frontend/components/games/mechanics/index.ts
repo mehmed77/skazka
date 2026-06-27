@@ -4,4 +4,9 @@ import "./EshitVaBos";
 import "./Juftla";
 import "./TopibBer";
 import "./Takrorlash"; // Faza 6 — SRS takrorlash (due itemlardan)
-// Faza 7: import "./HarfOvi"; ... | Faza 9: import "./SehrliErtak"; ...
+// Faza 7 — Trek A: kirill alifbo/fonetika
+import "./HarfOvi";
+import "./QaysiTovush";
+import "./HarfChiz";
+import "./SozQur";
+// Faza 9: import "./SehrliErtak"; ...

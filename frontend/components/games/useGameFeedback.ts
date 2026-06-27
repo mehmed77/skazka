@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import type { MishkaState } from "@/lib/mishka";
 import { useAudio } from "@/lib/useAudio";
@@ -30,6 +30,13 @@ export function useGameFeedback() {
     },
     [playCue]
   );
+
+  // Unmount'da kutilayotgan timer'ni tozalash (setState-after-unmount oldini olish)
+  useEffect(() => {
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, []);
 
   return { confetti, mishka, fire };
 }

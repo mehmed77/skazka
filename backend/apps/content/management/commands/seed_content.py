@@ -145,6 +145,37 @@ GAME_TYPES = [
     ),
 ]
 
+# Mexanika → SRS o'lchovi (Faza 7). reseptiv=tanib olish, ekspressiv=ishlab chiqarish.
+DIMENSIONS = {
+    "eshit_va_bos": "receptive",
+    "juftla": "receptive",
+    "topib_ber": "receptive",
+    "harf_ovi": "receptive",
+    "qaysi_tovush": "receptive",
+    "harf_chiz": "expressive",
+    "soz_qur": "expressive",
+    "sehrli_ertak": "receptive",
+    "qoshiq": "receptive",
+    "aytib_ber": "expressive",
+    "takrorlash": "receptive",
+}
+
+# Kirill harf → tovush (IPA-soda). Dinamik harf seed (mavzu so'zlari harflari) uchun.
+RU_SOUNDS = {
+    "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "je", "ё": "jo", "ж": "zh",
+    "з": "z", "и": "i", "й": "j", "к": "k", "л": "l", "м": "m", "н": "n", "о": "o",
+    "п": "p", "р": "r", "с": "s", "т": "t", "у": "u", "ф": "f", "х": "x", "ц": "ts",
+    "ч": "ch", "ш": "sh", "щ": "shch", "ъ": "", "ы": "y", "ь": "", "э": "e", "ю": "ju",
+    "я": "ja",
+}
+
+# So'z qurish (soz_qur) uchun qisqa so'zlar — FAQAT 1-guruh harflaridan (к,о,т,с,н,и,м,а,т)
+SHORT_WORDS = [
+    ("кот", "kot", 1, "mushuk (erkak)"),
+    ("сон", "son", 1, "uyqu / tush"),
+    ("нос", "nos", 1, "burun"),
+]
+
 
 class Command(BaseCommand):
     help = "Demo kurikulum kontentini yaratadi (idempotent)."
@@ -173,9 +204,9 @@ class Command(BaseCommand):
                 },
             )
 
-        # GameType katalogi
+        # GameType katalogi (+ dimension — idempotent, mavjud qatorga ham qo'llanadi)
         for key, uz, ru_name, skill, age, schema in GAME_TYPES:
-            GameType.objects.get_or_create(
+            gt, _ = GameType.objects.get_or_create(
                 key=key,
                 defaults={
                     "name_uz": uz,
@@ -185,6 +216,10 @@ class Command(BaseCommand):
                     "schema_json": schema,
                 },
             )
+            dim = DIMENSIONS.get(key, "receptive")
+            if gt.dimension != dim:
+                gt.dimension = dim
+                gt.save(update_fields=["dimension"])
 
         # Mavzular + so'zlar + darslar
         self._seed_theme(
@@ -218,6 +253,41 @@ class Command(BaseCommand):
             koshka.confusable_with.add(koza)  # symmetrical → ikki tomon ham
         except Word.DoesNotExist:
             pass
+
+        # ── Faza 7: harflar + alifbo darslari ──
+        # Qisqa so'zlar (so'z qurish uchun — FAQAT 1-guruh harflaridan)
+        for lemma, translit, freq, uz in SHORT_WORDS:
+            Word.objects.get_or_create(
+                language=ru,
+                lemma=lemma,
+                defaults={
+                    "translit": translit,
+                    "freq_rank": freq,
+                    "l1_translation_json": {"uz": uz},
+                    "part_of_speech": "noun",
+                },
+            )
+        # Mavzu so'zlaridagi BARCHA kirill harflarni Letter sifatida (so'z_qur/takrorlash uchun).
+        # Murakkab harflar (ж,ц,ч,ш,щ,ы,ъ,ь) faqat RECORD — alohida drill YO'Q (§3, keyin).
+        existing = set(Letter.objects.filter(language=ru).values_list("char", flat=True))
+        next_order = Letter.objects.filter(language=ru).count()
+        for w in Word.objects.filter(language=ru):
+            for ch in w.lemma.upper():
+                if ch in existing or not ch.isalpha():
+                    continue
+                next_order += 1
+                Letter.objects.get_or_create(
+                    language=ru,
+                    char=ch,
+                    defaults={
+                        "sound_ipa": RU_SOUNDS.get(ch.lower(), ""),
+                        "group_no": 2,
+                        "order": next_order,
+                    },
+                )
+                existing.add(ch)
+        # Alifbo mavzusi + darslari (harf mexanikalari + so'z qurish)
+        self._seed_alphabet(level, ru)
 
         counts = {
             "languages": Language.objects.count(),
@@ -307,3 +377,50 @@ class Command(BaseCommand):
                 order=step_order,
                 defaults={"kind": kind, "config_json": cfg},
             )
+
+    def _seed_alphabet(self, level, ru):
+        """Alifbo mavzusi: 1-guruh harf darsi (harf mexanikalari) + so'z qurish darsi (soz_qur)."""
+        theme, _ = Theme.objects.get_or_create(
+            level=level,
+            key="alphabet",
+            defaults={"order": 3, "title_uz": "Alifbo", "title_ru": "Алфавит", "icon": "🔤"},
+        )
+        group1 = list(Letter.objects.filter(language=ru, group_no=1).order_by("order"))
+        letter_items = [{"type": "letter", "id": str(ltr.id)} for ltr in group1]
+
+        # 1-dars: harf tanish/tovush/chizish (5-6)
+        lesson1, _ = Lesson.objects.get_or_create(
+            theme=theme,
+            order=1,
+            defaults={"title_uz": "Alifbo — 1-guruh", "title_ru": "Алфавит — 1", "min_age_band": "5-6"},
+        )
+        steps1 = [
+            (1, StepKind.INTRO, {"new_items": letter_items, "games": [{"type": "harf_ovi"}]}),
+            (
+                2,
+                StepKind.PRACTICE,
+                {
+                    "new_items": letter_items,
+                    "games": [{"type": "harf_ovi"}, {"type": "qaysi_tovush"}, {"type": "harf_chiz"}],
+                },
+            ),
+            (3, StepKind.MASTERY, {"new_items": letter_items, "games": [{"type": "harf_ovi"}]}),
+        ]
+        for o, k, cfg in steps1:
+            LessonStep.objects.update_or_create(lesson=lesson1, order=o, defaults={"kind": k, "config_json": cfg})
+
+        # 2-dars: so'z qurish (6-7) — qisqa so'zlar harflaridan
+        short = list(Word.objects.filter(language=ru, lemma__in=[w[0] for w in SHORT_WORDS]))
+        word_items = [{"type": "word", "id": str(w.id)} for w in short]
+        lesson2, _ = Lesson.objects.get_or_create(
+            theme=theme,
+            order=2,
+            defaults={"title_uz": "So'z qurish", "title_ru": "Собери слово", "min_age_band": "6-7"},
+        )
+        steps2 = [
+            (1, StepKind.INTRO, {"new_items": word_items, "games": [{"type": "soz_qur"}]}),
+            (2, StepKind.PRACTICE, {"new_items": word_items, "games": [{"type": "soz_qur"}]}),
+            (3, StepKind.MASTERY, {"new_items": word_items, "games": [{"type": "soz_qur"}]}),
+        ]
+        for o, k, cfg in steps2:
+            LessonStep.objects.update_or_create(lesson=lesson2, order=o, defaults={"kind": k, "config_json": cfg})

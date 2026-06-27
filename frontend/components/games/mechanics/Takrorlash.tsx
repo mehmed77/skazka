@@ -8,8 +8,10 @@ import { WordVisual } from "@/components/games/WordVisual";
 import { useGameFeedback } from "@/components/games/useGameFeedback";
 import { buildOptions, optionCountForAge } from "@/lib/games/distractors";
 import { registerMechanic } from "@/lib/games/registry";
-import type { MechanicProps, ResolvedItem } from "@/lib/games/types";
+import { itemLabel, type ItemType, type MechanicProps, type ResolvedItem } from "@/lib/games/types";
 import { useAudio } from "@/lib/useAudio";
+
+const ACCEPTS: ItemType[] = ["word", "letter"]; // aralash takrorlash (word+letter)
 
 // «Takrorlash» (mexanika #11) — aralash, FAQAT due itemlardan (ReviewPlayer beradi). Audio→bos.
 // Registry plugin: GamePlayer/ReviewPlayer markaziy kodi o'zgarmaydi (ADR-012).
@@ -31,7 +33,7 @@ function Takrorlash({ items, pool, spec, ageBand, onResult, onDone }: MechanicPr
   useEffect(() => {
     if (target) {
       startRef.current = Date.now();
-      speakName(target.lemma, target.audio_url);
+      speakName(itemLabel(target), target.audio_url);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target?.id]);
@@ -67,12 +69,12 @@ function Takrorlash({ items, pool, spec, ageBand, onResult, onDone }: MechanicPr
     <div
       className="flex flex-col items-center gap-6 p-6"
       data-game="takrorlash"
-      data-target={target.lemma}
+      data-target={itemLabel(target)}
     >
       <Mishka state={mishka} size="md" />
       <button
         type="button"
-        onClick={() => speakName(target.lemma, target.audio_url)}
+        onClick={() => speakName(itemLabel(target), target.audio_url)}
         aria-label="Qayta eshitish"
         className="rounded-pill bg-success/15 px-7 py-4 text-4xl active:scale-95"
       >
@@ -85,8 +87,8 @@ function Takrorlash({ items, pool, spec, ageBand, onResult, onDone }: MechanicPr
             type="button"
             onClick={() => pick(opt)}
             disabled={locked}
-            data-option={opt.lemma}
-            aria-label={opt.lemma}
+            data-option={itemLabel(opt)}
+            aria-label={itemLabel(opt)}
             className="flex h-28 w-28 items-center justify-center rounded-blob bg-card shadow-soft ring-4 ring-transparent transition active:scale-95 hover:ring-success/50"
           >
             <WordVisual item={opt} size="md" />
@@ -98,5 +100,5 @@ function Takrorlash({ items, pool, spec, ageBand, onResult, onDone }: MechanicPr
   );
 }
 
-registerMechanic("takrorlash", Takrorlash);
+registerMechanic("takrorlash", Takrorlash, ACCEPTS);
 export default Takrorlash;

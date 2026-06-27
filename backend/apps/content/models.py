@@ -286,11 +286,25 @@ class Song(BaseModel):
 
 
 # ── O'yin katalogi (data-driven dvigatel poydevori, §5) ──────
+class SkillDimension(models.TextChoices):
+    """SRS o'lchovi — qaysi strength haydaladi (§4.3). schedule(dimension) shuni o'qiydi."""
+
+    RECEPTIVE = "receptive", "Reseptiv (tanib olish)"
+    EXPRESSIVE = "expressive", "Ekspressiv (ishlab chiqarish)"
+
+
 class GameType(BaseModel):
     key = models.SlugField("kalit", max_length=32, unique=True)
     name_uz = models.CharField("nom (uz)", max_length=64)
     name_ru = models.CharField("nom (ru)", max_length=64, blank=True)
-    skill = models.CharField("ko'nikma", max_length=64, blank=True)
+    skill = models.CharField("ko'nikma", max_length=64, blank=True)  # erkin tavsif (slug)
+    # SRS o'lchovi: reseptiv (tanib olish) / ekspressiv (ishlab chiqarish) — strength'ni ajratadi
+    dimension = models.CharField(
+        "o'lcham (SRS)",
+        max_length=12,
+        choices=SkillDimension.choices,
+        default=SkillDimension.RECEPTIVE,
+    )
     min_age_band = models.CharField(
         "min yosh", max_length=8, choices=AgeBand.choices, default=AgeBand.Y3_4
     )

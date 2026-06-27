@@ -28,10 +28,16 @@ export function buildOptions(
   optionCount: number,
   excludeConfusable = true,
 ): ResolvedItem[] {
-  const conf = new Set(excludeConfusable ? target.confusable_ids : []);
-  let candidates = pool.filter((i) => i.id !== target.id && !conf.has(i.id));
-  // Graceful: confusable istisno tufayli nomzod qolmasa — istisnoni bo'shat (yonma-yon
-  // semantik interferensiya bitta-variantli TRIVIAL javobdan afzal). Kamida 2 variant.
+  const conf = new Set(excludeConfusable ? target.confusable_ids ?? [] : []);
+  // Distraktorlar TARGET TURI bilan bir xil (so'z↔so'z, harf↔harf) — aralash navbatda ham to'g'ri
+  let candidates = pool.filter(
+    (i) => i.id !== target.id && i.type === target.type && !conf.has(i.id),
+  );
+  // Graceful 1: confusable istisno tufayli nomzod qolmasa — istisnoni bo'shat (bir xil tur).
+  if (candidates.length === 0)
+    candidates = pool.filter((i) => i.id !== target.id && i.type === target.type);
+  // Graceful 2 (oxirgi chora — aralash review'da yagona-tur): bir xil turdagi nomzod YO'Q bo'lsa,
+  // TRIVIAL bitta-variantli javob (SRS'ni soxta to'g'ri bilan buzadi) o'rniga cross-type distraktor.
   if (candidates.length === 0) candidates = pool.filter((i) => i.id !== target.id);
   const distractors = shuffle(candidates).slice(0, Math.max(1, optionCount - 1));
   return shuffle([target, ...distractors]); // ≥2 (pool'da ≥1 boshqa item bo'lsa)

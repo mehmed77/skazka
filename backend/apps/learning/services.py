@@ -7,12 +7,17 @@ from django.db.models import Max
 from django.utils import timezone
 
 from .models import ItemState, ItemType, LearningEvent
-from .scheduler import schedule
+from .scheduler import RECEPTIVE, schedule
 
-# Reseptiv mastery (§4.3) — Faza 5 mexanikalari RESEPTIV (tanib olish). Ekspressiv hozir bo'sh.
-RECEPTIVE_GAIN = 0.34  # ~3 to'g'ri javob → mastery
-RECEPTIVE_PENALTY = 0.5
 NEW_DUE_DAYS = 1  # yangi item (intro exposure) → +1 kun
+
+
+def _dimension_for(game_type: str) -> str:
+    """game_type → SRS o'lchovi (reseptiv/ekspressiv). GameType.dimension'dan (fallback reseptiv)."""
+    from apps.content.models import GameType
+
+    gt = GameType.objects.filter(key=game_type).only("dimension").first()
+    return gt.dimension if gt else RECEPTIVE
 
 # Progress (lineer ochilish) ostonalari — YUMSHOQ (bola qamalib qolmasin, §6.3)
 STRENGTH_THRESHOLD = 0.5  # so'z "o'zlashtirilgan" deb hisoblanadi
@@ -63,13 +68,9 @@ def record_event(child, data: dict):
         # TEGINILMAYDI (xato mashqdan keyingi intro last_result'ni noto'g'ri "tuzatmasin").
         pass
     else:
-        # Reseptiv mashq (retrieval): natija + mastery + interval (schedule).
+        # Retrieval mashqi: natija + interval + mastery. dimension (reseptiv/ekspressiv) GameType'dan.
         state.last_result = ev.is_correct
-        if ev.is_correct:
-            state.receptive_strength = min(1.0, state.receptive_strength + RECEPTIVE_GAIN)
-        else:
-            state.receptive_strength = max(0.0, state.receptive_strength - RECEPTIVE_PENALTY)
-        schedule(state, ev.is_correct, ev.latency_ms)
+        schedule(state, ev.is_correct, ev.latency_ms, _dimension_for(ev.game_type))
 
     state.save()
     return ev, True
@@ -82,10 +83,8 @@ def get_due(child, limit: int = 8, now=None):
     avoidConfusableAdjacency) hal qilinadi: bu yer faqat due ro'yxatini beradi.
     """
     now = now or timezone.now()
-    qs = (
-        ItemState.objects.filter(child=child, item_type=ItemType.WORD, due_at__lte=now)
-        .order_by("due_at")[:limit]
-    )
+    # word + letter (Faza 7): harflar ham due bo'lib qaytadi (takrorlashda)
+    qs = ItemState.objects.filter(child=child, due_at__lte=now).order_by("due_at")[:limit]
     return list(qs)
 
 
@@ -131,7 +130,12 @@ def compute_theme_statuses(child) -> dict:
             statuses[str(theme.id)] = "available"
             continue
         seen = [wid for wid in word_ids if wid in states]
-        strong = [wid for wid in seen if states[wid].receptive_strength >= STRENGTH_THRESHOLD]
+        strong = [
+            wid
+            for wid in seen
+            if max(states[wid].receptive_strength, states[wid].expressive_strength)
+            >= STRENGTH_THRESHOLD
+        ]
         done = bool(word_ids) and (len(strong) / len(word_ids) >= DONE_RATIO)
         statuses[str(theme.id)] = "done" if done else ("started" if seen else "available")
         chain_open = done  # lineer: done bo'lmasa keyingilar qulf

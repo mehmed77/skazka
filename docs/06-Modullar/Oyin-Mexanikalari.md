@@ -35,6 +35,13 @@ SPEC §5: har mexanika **ko'nikma + retrieval** turiga bog'langan va `GameType` 
 | 10 | Aytib ber / «Скажи!» (ASR) | So'zni aytish | Ekspressiv (ovozli) | 5+ | 11 |
 | 11 | Takrorlash o'yini / «Повторюшка» | Aralash, muddati kelgan | Aralash retrieval | 4+ | 6 |
 
+> [!success] Faza 7 (Trek A) bajarildi — 2026-06-27 ([[99-Resurslar/Qaror-Jurnali#ADR-014 — Harf mexanikalari: acceptsItemTypes + schedule(dimension) + yumshoq tracing|ADR-014]])
+> Mexanika #4–7 ishlaydi: **harf_ovi**, **qaysi_tovush** (reseptiv) · **harf_chiz** (ekspressiv, Canvas
+> yumshoq qoplanish, touch-birlamchi) · **so'z_qur** (ekspressiv, harflardan). Hammasi registry plugin
+> (GamePlayer o'zgarmadi). **acceptsItemTypes** — har mexanika qabul qiladigan turini e'lon qiladi
+> (word/letter), navbat aralash bo'lsa item o'z mexanikasiga boradi. **Ekspressiv strength** ishga tushdi
+> (`schedule(dimension)` — [[06-Modullar/SRS-Learning]]). Murakkab harflar faqat record (drill keyin).
+
 ## Data-driven GamePlayer
 
 ```mermaid

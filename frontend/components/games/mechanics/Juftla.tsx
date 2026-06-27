@@ -8,15 +8,18 @@ import { WordVisual } from "@/components/games/WordVisual";
 import { useGameFeedback } from "@/components/games/useGameFeedback";
 import { shuffle } from "@/lib/games/distractors";
 import { registerMechanic } from "@/lib/games/registry";
-import type { MechanicProps, ResolvedItem } from "@/lib/games/types";
+import { itemLabel, type ItemType, type MechanicProps, type ResolvedItem } from "@/lib/games/types";
 import { useAudio } from "@/lib/useAudio";
+
+const ACCEPTS: ItemType[] = ["word", "letter"]; // memory ikkala turni qabul qiladi
 
 type Card = { key: string; item: ResolvedItem; kind: "image" | "audio" };
 
 // «Juftla» (memory) — rasm↔audio juftlarini ochish. Ochilgan audio karta nomini yangratadi.
-function Juftla({ items, spec, onResult, onDone }: MechanicProps) {
+function Juftla({ items: rawItems, spec, onResult, onDone }: MechanicProps) {
   const { speakName } = useAudio();
   const { confetti, mishka, fire } = useGameFeedback();
+  const items = useMemo(() => rawItems.filter((i) => (ACCEPTS as string[]).includes(i.type)), [rawItems]);
 
   // grid schema'dan ([4,6] → juftlar soni); kichik mavzu → graceful
   const pairRange = (spec.schema?.grid as number[]) ?? [4, 6];
@@ -48,7 +51,7 @@ function Juftla({ items, spec, onResult, onDone }: MechanicProps) {
 
   const flip = (card: Card) => {
     if (locked || matched.has(card.item.id) || flipped.includes(card.key)) return;
-    if (card.kind === "audio") speakName(card.item.lemma, card.item.audio_url);
+    if (card.kind === "audio") speakName(itemLabel(card.item), card.item.audio_url);
     const next = [...flipped, card.key];
     setFlipped(next);
     if (next.length === 2) {
@@ -84,7 +87,7 @@ function Juftla({ items, spec, onResult, onDone }: MechanicProps) {
               type="button"
               onClick={() => flip(card)}
               disabled={locked || matched.has(card.item.id)}
-              data-card={card.item.lemma}
+              data-card={itemLabel(card.item)}
               data-kind={card.kind}
               data-up={up}
               className="flex h-20 w-20 items-center justify-center rounded-xl2 bg-card text-3xl shadow-soft active:scale-95 disabled:opacity-70"
@@ -99,5 +102,5 @@ function Juftla({ items, spec, onResult, onDone }: MechanicProps) {
   );
 }
 
-registerMechanic("juftla", Juftla);
+registerMechanic("juftla", Juftla, ACCEPTS);
 export default Juftla;

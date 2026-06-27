@@ -31,6 +31,7 @@ created: 2026-06-26
 | [[#ADR-011 — Faza 3 xavfsizlik review + public-media xulosasi\|ADR-011]] | Public media + media/API xavfsizligi | ✅ qabul qilingan |
 | [[#ADR-012 — O'yin dvigateli: registry plugin + frontend distraktor\|ADR-012]] | Mexanika registry + §4.4 distraktor joyi | ✅ qabul qilingan |
 | [[#ADR-013 — SRS dvigateli: izolyatsiyalangan scheduler + idempotent event + polimorfik ItemState\|ADR-013]] | SRS yadrosi (Faza 6) | ✅ qabul qilingan |
+| [[#ADR-014 — Harf mexanikalari: acceptsItemTypes + schedule(dimension) + yumshoq tracing\|ADR-014]] | Trek A alifbo (Faza 7) | ✅ qabul qilingan |
 
 ---
 
@@ -194,6 +195,53 @@ bola-independent struktura; progress per-bola overlay; ETag'ga progress-stamp (3
 **Oqibat.** Bola so'z o'rgansa keyingi sessiyalarda kengayuvchi intervalda qaytadi; xato so'z tezroq.
 Event idempotent (outbox dublikat state buzmaydi). pytest 45/45 (13 yangi), Playwright 14/14; Faza 5
 testlari saqlandi. Qarang [[06-Modullar/SRS-Learning]], [[02-Arxitektura/SRS-Dvigateli]].
+
+---
+
+## ADR-014 — Harf mexanikalari: acceptsItemTypes + schedule(dimension) + yumshoq tracing
+**Holat:** ✅ qabul qilingan · Faza 7 (Trek A) · 2026-06-27
+
+**Kontekst.** Faza 7 — kirill alifbo/fonetika (SPEC §3 Trek A + §5 #4–7): harf_ovi, qaysi_tovush
+(reseptiv), harf_chiz, so'z_qur (ekspressiv). Ekspressiv strength SHU yerda ishga tushadi.
+
+**Qaror 1 — Navbat routing = mexanika-darajasida `acceptsItemTypes` (dars-tur filtri EMAS).**
+- `get_due` aralash (word+letter) qaytaradi. Har mexanika registry'da QABUL qiladigan turlarini
+  e'lon qiladi (`registerMechanic(key, Comp, accepts)`): eshit_va_bos→[word], harf_ovi/qaysi_tovush/
+  harf_chiz→[letter], so'z_qur→[word], juftla/takrorlash→[word,letter]. Mexanika kirish itemlarini
+  shunga filtrlaydi; `buildOptions` distraktorni TARGET TURI bilan bir xil tanlaydi.
+- **Sabab:** takrorlash (#11) aralash navbatni "bepul" to'g'ri qiladi (har item o'z mexanikasiga);
+  dars-tur filtridan toza; kelajakda juftla ikkala turni qabul qilsa — qayta yozish yo'q. Hook ichida
+  qoladi → **GamePlayer O'ZGARMAYDI**.
+
+**Qaror 2 — `schedule(state, correct, latency, dimension)` — ekspressiv ishga tushadi.**
+- `GameType.dimension` (receptive|expressive) yangi maydon (data-driven, admin-editable). `record_event`
+  game_type→dimension. `schedule()` interval (due_at/stability/reps) UMUMIY saqlaydi, faqat STRENGTH'ni
+  dimension bo'yicha ajratadi (receptive_strength | expressive_strength). Izolyatsiya PARAMETR orqali —
+  model/event o'zgarmaydi (ADR-013 saqlanadi). so'z_qur/harf_chiz → ekspressiv; harf_ovi/qaysi_tovush → reseptiv.
+
+**Qaror 3 — harf_chiz YUMSHOQ baholash (§6.3, perfeksionizm yo'q).**
+- Kontur kataklarining yetarli ulushi qoplansa qabul (`TRACE_COVERAGE_THRESHOLD` — bitta konstanta,
+  qurilmada qo'lda sozlanadi). Touch-birlamchi + responsive (sichqoncha ham). Xato→qayta imkon, jazo yo'q.
+
+**Qaror 4 — so'z_qur HARFLARDAN; murakkab harflar faqat RECORD.**
+- so'z lemma'sidan harflar aralashtiriladi → tartibga solinadi (segmentatsiya yo'q). Bo'g'in keyin
+  (seed'da QO'LDA, algoritmik bo'g'inlash YO'Q — rus qoidalari xato beradi). Murakkab harflar
+  (ж,ц,ч,ш,щ,ы,ъ,ь) faqat Letter RECORD (so'z_qur uchun) — alohida drill keyin (§3 oson→qiyin).
+
+**Boshqa.** ResolvedLetterSerializer'ga `confusable_ids: []` qo'shildi (uniform kontrakt — buildSessionQueue
+harf darsida crash bo'lmasin); frontend `?? []` defensiv guard.
+
+**Oqibat.** 4 mexanika registry plugin (GamePlayer o'zgarmadi); ekspressiv strength haydaladi; letterlar
+SRS'ga kiradi (polimorfik) + takrorlashga. pytest 48/48 + Playwright 17/17; Faza 5/6 saqlandi.
+Qarang [[06-Modullar/Oyin-Mexanikalari]], [[06-Modullar/SRS-Learning]].
+
+**Adversarial review (commit oldidan, 4 o'lcham × tasdiqlash).** 20 topilma → 3 tuzatildi:
+(1) **MED** — aralash review'da yagona-tur target `buildOptions`'da TRIVIAL 1-variant berib SRS'ni soxta
+"to'g'ri" bilan buzardi → cross-type oxirgi-chora fallback (doim ≥2 variant); (2) `useGameFeedback` timer
+unmount'da tozalanadi; (3) `useSessionQueue` deps `due.length`→due-tarkib kaliti.
+**Qabul qilingan (tuzatilmadi):** harf-due so'z darsiga to'qilsa tushib qoladi — `acceptsItemTypes`
+DIZAYNI (harflar review/harf-darsida qaytadi); mexanika round-timer unmount — React 18'da zararsiz
+(no-op); alifbo mavzusi "done" bo'lmasligi — kosmetik (oxirgi mavzu, bloklamaydi).
 
 **Adversarial review (commit oldidan, 4 o'lcham × tasdiqlash).** 17 topilma → 3 tuzatildi:
 (1) **bo'sh mavzu** (so'z yo'q) lineer zanjirni abadiy qulflar edi → bo'sh mavzu to'smaydi (regressiya testi);

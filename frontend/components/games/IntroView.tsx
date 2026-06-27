@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Mishka } from "@/components/Mishka";
 import { WordVisual } from "@/components/games/WordVisual";
 import { Button } from "@/components/ui";
-import type { ResolvedItem } from "@/lib/games/types";
+import { itemLabel, type ResolvedItem } from "@/lib/games/types";
 import { recordExposure } from "@/lib/learningEvents";
 import { useAudio } from "@/lib/useAudio";
 
@@ -28,9 +28,9 @@ export function IntroView({ items, onDone }: { items: ResolvedItem[]; onDone: ()
           <button
             key={it.id}
             type="button"
-            onClick={() => speakName(it.lemma, it.audio_url)}
-            aria-label={it.lemma}
-            data-intro-item={it.lemma}
+            onClick={() => speakName(itemLabel(it), it.audio_url)}
+            aria-label={itemLabel(it)}
+            data-intro-item={itemLabel(it)}
             className="flex h-24 w-24 items-center justify-center rounded-blob bg-card shadow-soft active:scale-95"
           >
             <WordVisual item={it} size="sm" />
