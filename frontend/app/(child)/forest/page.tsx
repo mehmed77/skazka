@@ -9,10 +9,11 @@ import { useEffect } from "react";
 import { Mishka } from "@/components/Mishka";
 import { childTokenStore } from "@/lib/child";
 import { cn } from "@/lib/cn";
-import { fetchCurriculum, fetchDue } from "@/lib/contentApi";
+import { fetchCurriculum, fetchDue, fetchForest } from "@/lib/contentApi";
 import { useLocale } from "@/lib/locale";
 import type { CurriculumTheme, ThemeStatus } from "@/lib/types";
 import { useAudio } from "@/lib/useAudio";
+import { useTimeExceeded } from "@/lib/useTimeExceeded";
 
 // Status — RANG + IKONA (rang yagona ma'no tashuvchi emas, rang-ko'r xavfsiz)
 const STATUS: Record<ThemeStatus, { icon: string; ring: string; bg: string }> = {
@@ -34,6 +35,7 @@ function themeStatus(theme: CurriculumTheme): ThemeStatus {
 export default function ForestPage() {
   const t = useTranslations("forest");
   const tr = useTranslations("review");
+  const tRew = useTranslations("reward");
   const router = useRouter();
   const reduce = useReducedMotion();
   const locale = useLocale((s) => s.locale);
@@ -60,6 +62,16 @@ export default function ForestPage() {
     refetchOnWindowFocus: false,
   });
   const dueCount = session?.count ?? 0;
+
+  // O'rmon dunyosi (Faza 8) — ochilgan bezaklar + Mishka buyumlari ("yaxshidan ajoyibga")
+  const { data: forest } = useQuery({
+    queryKey: ["gamification-forest"],
+    queryFn: fetchForest,
+    enabled: typeof window !== "undefined" && !!childTokenStore.access,
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: false,
+  });
+  const { exceeded } = useTimeExceeded();
 
   useEffect(() => {
     if (data) playCue("enter_map"); // ovozli ko'rsatma (audio-birinchi)
@@ -109,6 +121,35 @@ export default function ForestPage() {
           >
             ♻️ <span className="text-base">{dueCount}</span>
           </button>
+        )}
+
+        {/* Jonlangan o'rmon (Faza 8) — ochilgan bezaklar + Mishka buyumlari ("yaxshidan ajoyibga") */}
+        {forest && (forest.mishka.length > 0 || forest.elements.length > 0) && (
+          <div
+            data-forest-world
+            className="mt-2 flex max-w-md flex-wrap items-center justify-center gap-2 px-4 text-3xl"
+          >
+            {forest.mishka.map((m) => (
+              <span key={m.key} role="img" aria-label={pick(m.title_uz, m.title_ru)} title={pick(m.title_uz, m.title_ru)}>
+                {m.asset}
+              </span>
+            ))}
+            {forest.elements.map((e) => (
+              <span key={e.key} role="img" aria-label={pick(e.title_uz, e.title_ru)} title={pick(e.title_uz, e.title_ru)}>
+                {e.asset}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Yumshoq vaqt-limit bildirgisi — world ko'rinadi, faqat darsga kirish gate'lanadi (§6.3) */}
+        {exceeded && (
+          <p
+            data-sleepy-banner
+            className="mt-1 rounded-pill bg-muted px-4 py-1 text-sm text-muted-foreground"
+          >
+            💤 {tRew("sleepyShort")}
+          </p>
         )}
       </header>
 

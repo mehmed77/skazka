@@ -80,5 +80,36 @@
     "title": "Повторение",
     "empty": "Пока нечего повторять!",
     "home": "Домой"
+  },
+  "reward": {
+    "newFriend": "Новый друг!",
+    "sleepy": "Мишка устал — поиграем завтра!",
+    "sleepyShort": "Мишка отдыхает",
+    "home": "Домой"
+  },
+  "parent": {
+    "title": "Прогресс",
+    "back": "Назад",
+    "notFound": "Профиль не найден",
+    "words": "Слова",
+    "letters": "Буквы",
+    "receptive": "Узнавание",
+    "expressive": "Произношение",
+    "themes": "Темы",
+    "minutesToday": "сегодня (мин)",
+    "streak": "Серия дней",
+    "difficult": "Трудные слова",
+    "limitTitle": "Дневной лимит времени",
+    "current": "Текущий",
+    "min": "мин",
+    "minPlaceholder": "минуты",
+    "noLimit": "Без лимита",
+    "save": "Сохранить",
+    "removeLimit": "Убрать лимит",
+    "rivoj": "Прогресс",
+    "status_done": "завершено",
+    "status_started": "начато",
+    "status_available": "открыто",
+    "status_locked": "закрыто"
   }
 }

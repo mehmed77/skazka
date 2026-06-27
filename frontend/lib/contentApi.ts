@@ -41,3 +41,33 @@ export const fetchDue = async (): Promise<{ due: ResolvedItem[]; count: number }
 export const postEvent = async (ev: Record<string, unknown>): Promise<void> => {
   await contentApi.post("/learning/event/", ev);
 };
+
+// Faza 8 — geymifikatsiya (bola-kontekst): o'rmon dunyosi + vaqt tekshiruvi
+export type ForestReward = {
+  key: string;
+  title_uz: string;
+  title_ru: string;
+  asset: string;
+  new: boolean;
+  slot?: string;
+  icon?: string;
+  category?: string;
+};
+export type ForestWorld = {
+  elements: ForestReward[];
+  mishka: ForestReward[];
+  achievements: ForestReward[];
+  recent: { kind: string; title_uz: string; title_ru: string; asset: string }[];
+  streak: { current: number; longest: number };
+};
+export const fetchForest = async (): Promise<ForestWorld> =>
+  (await contentApi.get("/gamification/forest/")).data;
+
+// "Yangi" mukofotlarni ko'rilgan deb belgilash (ResultView "yangi do'st" ko'rsatgach — GET endi belgilamaydi)
+export const markForestSeen = async (): Promise<void> => {
+  await contentApi.post("/gamification/forest/seen/", {});
+};
+
+export type TimeCheck = { minutes_today: number; limit: number | null; exceeded: boolean };
+export const fetchTimeCheck = async (): Promise<TimeCheck> =>
+  (await contentApi.get("/gamification/timecheck/")).data;

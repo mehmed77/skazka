@@ -108,6 +108,7 @@ class ChildProfileSerializer(serializers.ModelSerializer):
             "is_active",
             "has_pin",
             "pin",
+            "daily_limit_minutes",
             "created_at",
         ]
         read_only_fields = ["id", "has_pin", "created_at"]

@@ -19,6 +19,98 @@ from apps.content.models import (
     Theme,
     Word,
 )
+from apps.gamification.models import Achievement, ForestElement, MishkaItem
+
+# ── Geymifikatsiya katalogi (Faza 8) — data-driven rule_json; MAVJUD SRS'dan ochiladi ──
+ACHIEVEMENTS = [
+    (
+        "first_words",
+        "Birinchi so'zlar",
+        "Первые слова",
+        "milestone",
+        "🌱",
+        {"type": "words_receptive", "count": 3},
+    ),
+    (
+        "ten_words",
+        "O'n so'z",
+        "Десять слов",
+        "milestone",
+        "🏅",
+        {"type": "words_receptive", "count": 10},
+    ),
+    (
+        "animals_master",
+        "Hayvonlar ustasi",
+        "Мастер животных",
+        "theme",
+        "🐾",
+        {"type": "theme_done", "theme_key": "animals_home"},
+    ),
+    (
+        "first_letters",
+        "Birinchi harflar",
+        "Первые буквы",
+        "alphabet",
+        "🔤",
+        {"type": "letters_receptive", "count": 3},
+    ),
+    (
+        "word_builder",
+        "So'z quruvchi",
+        "Строитель слов",
+        "alphabet",
+        "✍️",
+        {"type": "expressive_any", "count": 1},
+    ),
+    (
+        "streak_3",
+        "Uch kun ketma-ket",
+        "Три дня подряд",
+        "streak",
+        "🔥",
+        {"type": "streak", "days": 3},
+    ),
+]
+FOREST_ELEMENTS = [
+    ("flowers", "Gullar", "Цветы", "🌸", {"type": "words_receptive", "count": 3}),
+    ("butterfly", "Kapalak", "Бабочка", "🦋", {"type": "words_receptive", "count": 6}),
+    (
+        "rabbit",
+        "Quyon",
+        "Зайчик",
+        "🐰",
+        {"type": "theme_done", "theme_key": "animals_home"},
+    ),
+    (
+        "rainbow",
+        "Kamalak",
+        "Радуга",
+        "🌈",
+        {"type": "theme_done", "theme_key": "colors"},
+    ),
+    ("bird", "Qushcha", "Птичка", "🐦", {"type": "letters_receptive", "count": 3}),
+    ("sun", "Quyosh", "Солнце", "☀️", {"type": "streak", "days": 2}),
+]
+MISHKA_ITEMS = [
+    ("hat", "Shapka", "Шапка", "hat", "🎩", {"type": "words_receptive", "count": 5}),
+    (
+        "scarf",
+        "Sharf",
+        "Шарф",
+        "scarf",
+        "🧣",
+        {"type": "theme_done", "theme_key": "animals_home"},
+    ),
+    (
+        "glasses",
+        "Ko'zoynak",
+        "Очки",
+        "glasses",
+        "👓",
+        {"type": "letters_receptive", "count": 5},
+    ),
+]
 
 # (lemma, translit, stress_index, uz, gender, plural, freq_rank, is_cognate_uz)
 ANIMALS = [
@@ -318,6 +410,43 @@ class Command(BaseCommand):
                 existing.add(ch)
         # Alifbo mavzusi + darslari (harf mexanikalari + so'z qurish)
         self._seed_alphabet(level, ru)
+
+        # Geymifikatsiya katalogi (Faza 8) — idempotent
+        for i, (key, uz, ru_t, cat, icon, rule) in enumerate(ACHIEVEMENTS, start=1):
+            Achievement.objects.get_or_create(
+                key=key,
+                defaults={
+                    "title_uz": uz,
+                    "title_ru": ru_t,
+                    "category": cat,
+                    "icon": icon,
+                    "rule_json": rule,
+                    "order": i,
+                },
+            )
+        for i, (key, uz, ru_t, asset, rule) in enumerate(FOREST_ELEMENTS, start=1):
+            ForestElement.objects.get_or_create(
+                key=key,
+                defaults={
+                    "title_uz": uz,
+                    "title_ru": ru_t,
+                    "asset_slot": asset,
+                    "rule_json": rule,
+                    "order": i,
+                },
+            )
+        for i, (key, uz, ru_t, slot, asset, rule) in enumerate(MISHKA_ITEMS, start=1):
+            MishkaItem.objects.get_or_create(
+                key=key,
+                defaults={
+                    "title_uz": uz,
+                    "title_ru": ru_t,
+                    "slot": slot,
+                    "asset_slot": asset,
+                    "rule_json": rule,
+                    "order": i,
+                },
+            )
 
         counts = {
             "languages": Language.objects.count(),

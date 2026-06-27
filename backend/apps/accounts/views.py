@@ -16,6 +16,22 @@ from .serializers import (
 )
 
 
+class IsParentToken(permissions.BasePermission):
+    """Ota-ona zonasi — SOF ota-ona tokeni (bola-kontekst token RAD).
+
+    Bola-kontekst token (enter mint qilgan, `active_child_id` claim'i bor) bilan ota-ona profil
+    amallarini (CRUD, daily_limit PATCH, progress) bajarib bo'lmaydi — bola o'zi limitni uzaytira
+    olmasin (§8, Parent Gate ortida). Bola zonasi endpointlari (content/learning/gamification)
+    aksincha `active_child_id` TALAB qiladi.
+    """
+
+    message = "Bu amal ota-ona tokeni bilan bajariladi (bola-kontekst token emas)."
+
+    def has_permission(self, request, view):
+        payload = getattr(request.auth, "payload", None) or {}
+        return "active_child_id" not in payload
+
+
 class RegisterView(generics.GenericAPIView):
     """Ota-ona ro'yxati → akkaunt + JWT (avtomatik kirish)."""
 
@@ -80,7 +96,10 @@ class ChildProfileViewSet(viewsets.ModelViewSet):
     """Bola profillari CRUD — faqat o'z bolalari (object-level izolyatsiya)."""
 
     serializer_class = ChildProfileSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsParentToken,
+    ]  # bola-kontekst token RAD
 
     def get_throttles(self):
         # enter → PIN brute-force himoyasi (qattiqroq); CRUD → profiles
@@ -113,3 +132,11 @@ class ChildProfileViewSet(viewsets.ModelViewSet):
                 ).data,
             }
         )
+
+    @action(detail=True, methods=["get"])
+    def progress(self, request, pk=None):
+        """Ota-ona paneli — REAL SRS rivoji (ota-ona JWT; egalik get_queryset orqali, begona bola 404)."""
+        child = self.get_object()  # parent=request.user tekshirilgan
+        from apps.gamification.services import child_progress
+
+        return Response(child_progress(child))

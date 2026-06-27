@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
@@ -18,6 +19,7 @@ const AGE_BANDS: AgeBand[] = ["3-4", "5-6", "6-7"];
 
 export default function ProfilesPage() {
   const t = useTranslations("profiles");
+  const tp = useTranslations("parent");
   const router = useRouter();
   const qc = useQueryClient();
   const { speak } = useAudio();
@@ -85,18 +87,26 @@ export default function ProfilesPage() {
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           {profiles.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => onCardClick(c)}
-              className="flex flex-col items-center gap-2 rounded-blob bg-card p-5 shadow-soft transition hover:scale-105 active:scale-95"
-            >
-              <span className="text-6xl">{avatarEmoji(c.avatar_id)}</span>
-              <span className="text-lg font-bold">{c.display_name}</span>
-              <span className="text-xs text-muted-foreground">
-                {c.age_band} {c.has_pin ? "🔒" : ""}
-              </span>
-            </button>
+            <div key={c.id} className="flex flex-col gap-1">
+              <button
+                type="button"
+                onClick={() => onCardClick(c)}
+                className="flex flex-col items-center gap-2 rounded-blob bg-card p-5 shadow-soft transition hover:scale-105 active:scale-95"
+              >
+                <span className="text-6xl">{avatarEmoji(c.avatar_id)}</span>
+                <span className="text-lg font-bold">{c.display_name}</span>
+                <span className="text-xs text-muted-foreground">
+                  {c.age_band} {c.has_pin ? "🔒" : ""}
+                </span>
+              </button>
+              {/* Ota-ona paneli (rivoj) — REAL SRS (Faza 8) */}
+              <Link
+                href={`/children/${c.id}`}
+                className="text-center text-xs font-semibold text-brand-600 hover:underline"
+              >
+                📊 {tp("rivoj")}
+              </Link>
+            </div>
           ))}
 
           <button

@@ -42,6 +42,7 @@ api_v1 = [
     *_profiles_router.urls,
     path("", include("apps.content.urls")),
     path("", include("apps.learning.urls")),
+    path("", include("apps.gamification.urls")),
 ]
 
 urlpatterns = [

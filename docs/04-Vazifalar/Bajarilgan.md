@@ -11,6 +11,23 @@ created: 2026-06-26
 > Bog'liq: [[04-Vazifalar/Backlog|📥 Backlog]] · [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[03-Reja/Bosqichlar#Faza 0|🪜 Faza 0]]
 > Tugagan vazifalar shu yerga sana bilan ko'chiriladi (eng yangisi tepada).
 
+## ✅ Faza 8 — Geymifikatsiya + ota-ona paneli (2026-06-27)
+[[SPEC]] §6 (geymifikatsiya) + §8 (ota-ona paneli). "O'rmonni jonlantirish". **Additiv** — MAVJUD SRS'dan.
+
+- [x] **`gamification` app:** Achievement/ForestElement/MishkaItem (data-driven `rule_json`) + Child× (`seen`) + StreakRecord ✅ 2026-06-27 #modul/gamification → [[99-Resurslar/Qaror-Jurnali#ADR-015 — Geymifikatsiya: ichki-yo'naltirilgan + SRS'dan + ota-ona paneli|ADR-015]]
+- [x] **`evaluate_rewards`** — MAVJUD SRS'dan, IDEMPOTENT, **lazy gamification GET'da** (learning/SRS/GamePlayer tegilmaydi); handler-map (`words_receptive`/`theme_done`/`streak`/...) ✅ 2026-06-27 #modul/gamification
+- [x] **Ichki-yo'naltirilgan** (ball/liderboard/XP YO'Q, §6.3): mukofot = jonlangan o'rmon + Mishka + yutuq; streak ayblov emas ✅ 2026-06-27
+- [x] **O'rmon dunyosi** ("yaxshidan ajoyibga"): `/forest` xaritasi ochilgan bezaklar bilan boyiydi; natija ekrani "🌳 yangi do'st!" (`seen` bayrog'i — bir marta) ✅ 2026-06-27 #modul/frontend
+- [x] **Ota-ona paneli** (`/children/{id}`, parent JWT + egalik authz): REAL SRS rivoji (mastery, mavzu, faollik, qiyin so'zlar) ✅ 2026-06-27 #modul/frontend
+- [x] **Vaqt cheklovi YUMSHOQ:** `daily_limit_minutes` (ota-ona); **gap-asosli** `minutes_today`; chegara nuqtalarida (o'rtada uzmaydi) → "Mishka charchadi" ✅ 2026-06-27 #modul/gamification
+- [x] Asset slot (emoji placeholder); bola zonasi devori saqlangan; **GamePlayer/SRS O'ZGARMADI** ✅ 2026-06-27
+- [x] pytest **55/55** (7 yangi) + black + Playwright (Faza 5/6/7 saqlandi) ✅ 2026-06-27
+
+> [!success] Faza 8 qabul mezonlari bajarildi
+> Bola REAL SRS'dan yutuq/element ochadi, o'rmoni boyiydi; ota-ona REAL rivojni ko'radi (eng katta
+> qulflangan qiymat ochildi); vaqt yumshoq cheklanadi; ichki-yo'naltirilgan (ball yo'q). Keyingi:
+> **Faza 9** (sehrli_ertak + qo'shiq) yoki sayqal/asset ishlab chiqarish.
+
 ## ✅ Faza 7 — Trek A: kirill alifbo/fonetika mexanikalari (2026-06-27)
 [[SPEC]] §3 Trek A + §5 (#4–7). **Additiv.** Ekspressiv strength SHU fazada ishga tushdi.
 
@@ -175,6 +192,6 @@ API health 200, frontend ochiladi, migratsiyalar o'tadi, Celery worker ulanadi. 
 - [x] Yo'l xaritasi va 11 faza rejalashtirildi ✅ 2026-06-26 #modul/loyiha → [[03-Reja/Yol-Xaritasi|🛣️ Yo'l xaritasi]]
 
 ## 📊 Statistika
-- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) + Faza 4 (**8**) + Faza 5 (**8**) + Faza 6 (**8**) + Faza 7 (**8**) = **89**
-- Joriy bosqich: **Faza 7 tugadi** → Faza 8 (geymifikatsiya) / Faza 9 (ertak/qo'shiq) tayyorgarlik
+- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) + Faza 4 (**8**) + Faza 5 (**8**) + Faza 6 (**8**) + Faza 7 (**8**) + Faza 8 (**8**) = **97**
+- Joriy bosqich: **Faza 8 tugadi** → Faza 9 (sehrli ertak + qo'shiq) tayyorgarlik
 - Keyingi: [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[04-Vazifalar/Backlog|📥 Backlog]]

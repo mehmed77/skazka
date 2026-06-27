@@ -80,5 +80,36 @@
     "title": "Takrorlash",
     "empty": "Hozircha takrorlash yo'q!",
     "home": "Uyga"
+  },
+  "reward": {
+    "newFriend": "Yangi do'st!",
+    "sleepy": "Mishka charchadi — ertaga yana o'ynaymiz!",
+    "sleepyShort": "Mishka dam olmoqda",
+    "home": "Uyga"
+  },
+  "parent": {
+    "title": "Rivoj",
+    "back": "Orqaga",
+    "notFound": "Profil topilmadi",
+    "words": "So'zlar",
+    "letters": "Harflar",
+    "receptive": "Tanish",
+    "expressive": "Aytish",
+    "themes": "Mavzular",
+    "minutesToday": "bugun (daqiqa)",
+    "streak": "Ketma-ketlik",
+    "difficult": "Qiyin so'zlar",
+    "limitTitle": "Kunlik vaqt limiti",
+    "current": "Joriy",
+    "min": "daqiqa",
+    "minPlaceholder": "daqiqa",
+    "noLimit": "Cheksiz (limit yo'q)",
+    "save": "Saqlash",
+    "removeLimit": "Limitni olib tashlash",
+    "rivoj": "Rivoj",
+    "status_done": "tugadi",
+    "status_started": "boshlandi",
+    "status_available": "ochiq",
+    "status_locked": "qulf"
   }
 }

@@ -2,7 +2,7 @@
 title: Geymifikatsiya moduli
 type: modul
 tags: [modul/gamification, loyiha, pedagogika]
-status: rejada
+status: bajarildi
 faza: Faza 8
 created: 2026-06-26
 ---
@@ -12,6 +12,14 @@ created: 2026-06-26
 > Faza 8 · Bog'liq: [[01-Loyiha/Pedagogik-Asos]] · [[06-Modullar/Dizayn-Tizimi]] · [[06-Modullar/SRS-Learning]] · [[01-Loyiha/Foydalanuvchi-Rollari]]
 
 SPEC §6: **muvozanatli, ichki-yo'naltirilgan** motivatsiya. Asosiy haydovchi — "men yangi narsa bila olaman" hissi, ball emas.
+
+> [!success] Bajarildi (Faza 8 — 2026-06-27 · [[99-Resurslar/Qaror-Jurnali#ADR-015 — Geymifikatsiya: ichki-yo'naltirilgan + SRS'dan + ota-ona paneli|ADR-015]])
+> `gamification` app: **Achievement/ForestElement/MishkaItem** (data-driven `rule_json`) + Child× (`seen`) +
+> StreakRecord. **`evaluate_rewards`** MAVJUD SRS'dan, IDEMPOTENT, lazy GET'da (learning/SRS/GamePlayer
+> tegilmaydi). **Ball/liderboard YO'Q** (§6.3) — mukofot = jonlangan o'rmon ("yaxshidan ajoyibga") +
+> Mishka + yutuq; streak ayblov emas. **Ota-ona paneli** (REAL SRS rivoji, parent JWT + egalik authz).
+> **Vaqt cheklovi** yumshoq (gap-asosli `minutes_today`, chegara nuqtalarida, "Mishka charchadi").
+> Asset slot (emoji placeholder). pytest 55/55, Playwright 18/18. Qolgan: jonli asset, ota-ona haftalik xulosa (keyin).
 
 > [!warning] Ilmiy ogohlantirish (SPEC §6)
 > Haddan ortiq tashqi mukofot (ko'p ball, liderboard) 3–7 yoshda **ichki motivatsiyani siqib

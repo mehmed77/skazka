@@ -32,6 +32,7 @@ created: 2026-06-26
 | [[#ADR-012 — O'yin dvigateli: registry plugin + frontend distraktor\|ADR-012]] | Mexanika registry + §4.4 distraktor joyi | ✅ qabul qilingan |
 | [[#ADR-013 — SRS dvigateli: izolyatsiyalangan scheduler + idempotent event + polimorfik ItemState\|ADR-013]] | SRS yadrosi (Faza 6) | ✅ qabul qilingan |
 | [[#ADR-014 — Harf mexanikalari: acceptsItemTypes + schedule(dimension) + yumshoq tracing\|ADR-014]] | Trek A alifbo (Faza 7) | ✅ qabul qilingan |
+| [[#ADR-015 — Geymifikatsiya: ichki-yo'naltirilgan + SRS'dan + ota-ona paneli\|ADR-015]] | Geymifikatsiya + ota-ona paneli (Faza 8) | ✅ qabul qilingan |
 
 ---
 
@@ -234,6 +235,50 @@ harf darsida crash bo'lmasin); frontend `?? []` defensiv guard.
 **Oqibat.** 4 mexanika registry plugin (GamePlayer o'zgarmadi); ekspressiv strength haydaladi; letterlar
 SRS'ga kiradi (polimorfik) + takrorlashga. pytest 48/48 + Playwright 17/17; Faza 5/6 saqlandi.
 Qarang [[06-Modullar/Oyin-Mexanikalari]], [[06-Modullar/SRS-Learning]].
+
+---
+
+## ADR-015 — Geymifikatsiya: ichki-yo'naltirilgan + SRS'dan + ota-ona paneli
+**Holat:** ✅ qabul qilingan · Faza 8 · 2026-06-27
+
+**Kontekst.** SPEC §6 (geymifikatsiya) + §8 (ota-ona paneli). Mukofot dunyosi: "O'RMONNI JONLANTIRISH".
+SRS yetti faza boy ma'lumot to'pladi (mastery, qiyin itemlar) — endi ko'rinish + motivatsiya qatlami.
+
+**Qaror 1 — ICHKI-YO'NALTIRILGAN (ball/liderboard/XP YO'Q, §6.3).** Mukofot = yig'iladigan dunyo
+(o'rmonni jonlantirish) + Mishka customization + yutuq ("men yangi narsa bila olaman" hissi). Streak
+bolaga AYBLOV emas (asosan ota-ona paneliga). Hammasi MAVJUD SRS'dan — `evaluate_rewards` IDEMPOTENT,
+**lazy gamification GET'da** (learning/SRS/GamePlayer butunlay tegilmaydi). `rule_json` data-driven
+(handler-map; registry shart emas — shartlar kam xil-xil).
+
+**Qaror 2 — "yangi ochilgan" `seen` bayrog'i.** ChildAchievement/Element/MishkaItem `seen=False` →
+forest GET "recent" qaytaradi va seen=True qiladi → natija ekrani "🌳 yangi do'st!"ni faqat haqiqatan
+yangi ochilganga bir marta ko'rsatadi (qayta kirishda takrorlanmaydi).
+
+**Qaror 3 — O'rmon "YAXSHIDAN AJOYIBGA".** Bo'sh emas — boshidanoq tirik (Mishka, daraxtlar); yutuq
+BOYITADI (qo'shimcha bezaklar). Elementlar = ASSET slot (emoji placeholder, keyin sprite). Forest
+xaritasi (Faza 4) + jonlangan o'rmon BIR dunyoda; bola zonasi devori saqlanadi.
+
+**Qaror 4 — Vaqt: GAP-ASOSLI (SessionLog/heartbeat YO'Q).** `minutes_today` LearningEvent.ts'dan —
+ketma-ket event'lar orasi `ACTIVE_GAP_SECONDS` (konstanta) dan kichik bo'lsa faol vaqtga qo'shiladi,
+katta bo'lsa tanaffus (bir necha sessiyani to'g'ri ajratadi). To'liq analitika+heartbeat → Faza 10.
+
+**Qaror 5 — Vaqt cheklovi YUMSHOQ.** `ChildProfile.daily_limit_minutes` (ota-ona o'rnatadi). Chegara
+nuqtalarida (forest-kirish bildirgi + dars-boshi gate) tekshiriladi — o'rtada UZMAYDI; yetganda
+"Mishka charchadi, ertaga" (jazo emas). Ota-ona paneli = `ChildProfileViewSet` @action `progress`
+(parent JWT + Faza 3 egalik authz; alohida app YO'Q) — REAL SRS (mastery, mavzu, faollik, qiyin).
+
+**Oqibat.** Bola yutuq/element ochadi (REAL SRS'dan), o'rmoni boyiydi; ota-ona REAL rivojni ko'radi;
+vaqt yumshoq cheklanadi. learning/SRS/GamePlayer O'ZGARMADI. pytest 56/56, Playwright; Faza 5/6/7 saqlandi.
+Qarang [[06-Modullar/Geymifikatsiya]], [[01-Loyiha/Foydalanuvchi-Rollari]].
+
+**Adversarial review (commit oldidan, 4 o'lcham × tasdiqlash).** 19 topilma → tuzatildi:
+(1) **HIGH XAVFSIZLIK** — bola-kontekst token ota-ona endpointlarini (daily_limit PATCH, progress) chaqira
+olardi → `IsParentToken` permission (active_child_id'li token RAD; bola limitni uzaytira olmaydi);
+(2) ForestView GET `seen`'ni o'zgartirardi (non-idempotent + race) → GET FAQAT O'QIYDI, alohida
+`POST /forest/seen/` ack (ResultView chaqiradi); (3) ResultView forest GET event-sync'dan oldin ishlardi
+("yangi do'st" o'tkazib yuborardi) → `flushOutbox` kutiladi + xarita invalidate; (4) `daily_limit=0`
+"cheksiz" deb talqin qilinardi → `limit is not None` (0 = o'yin yo'q); + locale theme, 404 handling,
+unused param. Qabul qilingan: streak write-on-read (zararsiz), audio overlap (yangi do'st ustun).
 
 **Adversarial review (commit oldidan, 4 o'lcham × tasdiqlash).** 20 topilma → 3 tuzatildi:
 (1) **MED** — aralash review'da yagona-tur target `buildOptions`'da TRIVIAL 1-variant berib SRS'ni soxta
