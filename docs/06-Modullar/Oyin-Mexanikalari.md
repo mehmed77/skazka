@@ -42,6 +42,13 @@ SPEC §5: har mexanika **ko'nikma + retrieval** turiga bog'langan va `GameType` 
 > (word/letter), navbat aralash bo'lsa item o'z mexanikasiga boradi. **Ekspressiv strength** ishga tushdi
 > (`schedule(dimension)` — [[06-Modullar/SRS-Learning]]). Murakkab harflar faqat record (drill keyin).
 
+> [!success] Faza 9 bajarildi — 2026-06-28 ([[99-Resurslar/Qaror-Jurnali#ADR-016 — Ertak/qo'shiq: kontent konteyner + comprehension §4.4 + mavzu ichida|ADR-016]])
+> Mexanika #8–9: **sehrli_ertak** (TPRS, CHIZIQLI — narration + comprehension gate, §4.4 buildOptions) +
+> **qoshiq** (ko'p sezgili — lyrics highlight + exposure intro-kabi). Story/Song = kontent KONTEYNER
+> (spec.story/song; item emas). Hayvonlar mavzusi ICHIDA dars (TPRS rich) → **dars-tanlovchi** (>1 dars).
+> Registry plugin (GamePlayer o'zgarmadi). Real narration/qo'shiq audiosi = asset slot (keyin).
+> **9/11 mexanika tayyor** (qolgan: aytib_ber #10 ASR — Faza 11; takrorlash #11 — Faza 6'da bor).
+
 ## Data-driven GamePlayer
 
 ```mermaid

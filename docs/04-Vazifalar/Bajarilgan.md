@@ -11,6 +11,21 @@ created: 2026-06-26
 > Bog'liq: [[04-Vazifalar/Backlog|📥 Backlog]] · [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[03-Reja/Bosqichlar#Faza 0|🪜 Faza 0]]
 > Tugagan vazifalar shu yerga sana bilan ko'chiriladi (eng yangisi tepada).
 
+## ✅ Faza 9 — Sehrli ertak + qo'shiq (2026-06-28)
+[[SPEC]] §5 #8–9. Ertak/qo'shiq Hayvonlar mavzusi ICHIDA (TPRS RICH). Asset (narration/qo'shiq audiosi) parallel — TTS placeholder.
+
+- [x] **Resolve serializerlar:** `ResolvedStory` (sahnalar + comprehension `prompt_word`) + `ResolvedSong` (lyrics + words); `get_games` `story_id`/`song_id` resolve (kontent konteyner — item emas) ✅ 2026-06-28 #modul/content → [[99-Resurslar/Qaror-Jurnali#ADR-016 — Ertak/qo'shiq: kontent konteyner + comprehension §4.4 + mavzu ichida|ADR-016]]
+- [x] **`sehrli_ertak`** (reseptiv, registry plugin): CHIZIQLI ertak — narration + comprehension gate (to'g'ri so'z → keyingi; xato → qayta); distraktor **§4.4 buildOptions qayta ishlatildi** ✅ 2026-06-28 #modul/games
+- [x] **`qoshiq`** (reseptiv, ko'p sezgili): lyrics + so'z highlight; **exposure = intro kabi** (Faza 6 `recordExposure` — strength oshmaydi); audio = asset slot ✅ 2026-06-28 #modul/games
+- [x] **Seed:** Hayvonlar ICHIDA ertak darsi + qo'shiq darsi (mavzu so'zlaridan); idempotent ✅ 2026-06-28 #modul/content
+- [x] **Dars-tanlovchi** (forest >1 dars → BottomSheet; lesson `kind` ikona) — Faza 7 Alifbo navigatsiya bo'shlig'ini ham yopdi ✅ 2026-06-28 #modul/frontend
+- [x] **GamePlayer/SRS O'ZGARMADI**; pytest **57/57** + black + Playwright (story/song/picker; Faza 5/6/7/8 saqlandi) ✅ 2026-06-28
+
+> [!success] Faza 9 qabul mezonlari bajarildi
+> Bola ertakni tinglaydi + comprehension tanlaydi (so'z mustahkamlanadi), qo'shiqni ko'p-sezgili tinglaydi
+> (so'z tanishtiriladi). Ertak/qo'shiq mavzu ichida (TPRS rich); registry plugin (GamePlayer o'zgarmadi);
+> real audio = asset slot (keyin). Keyingi: asset ishlab chiqarish / Faza 10 (offline-PWA) / aytib_ber (#10, ASR).
+
 ## ✅ Faza 8 — Geymifikatsiya + ota-ona paneli (2026-06-27)
 [[SPEC]] §6 (geymifikatsiya) + §8 (ota-ona paneli). "O'rmonni jonlantirish". **Additiv** — MAVJUD SRS'dan.
 
@@ -192,6 +207,6 @@ API health 200, frontend ochiladi, migratsiyalar o'tadi, Celery worker ulanadi. 
 - [x] Yo'l xaritasi va 11 faza rejalashtirildi ✅ 2026-06-26 #modul/loyiha → [[03-Reja/Yol-Xaritasi|🛣️ Yo'l xaritasi]]
 
 ## 📊 Statistika
-- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) + Faza 4 (**8**) + Faza 5 (**8**) + Faza 6 (**8**) + Faza 7 (**8**) + Faza 8 (**8**) = **97**
-- Joriy bosqich: **Faza 8 tugadi** → Faza 9 (sehrli ertak + qo'shiq) tayyorgarlik
+- Bajarilgan: rejalashtirish (**5**) + Faza 0 (**19**) + Faza 1 (**10**) + Faza 2 (**10**) + Faza 2.5 (**4**) + Faza 3 (**9**) + Faza 4 (**8**) + Faza 5 (**8**) + Faza 6 (**8**) + Faza 7 (**8**) + Faza 8 (**8**) + Faza 9 (**6**) = **103**
+- Joriy bosqich: **Faza 9 tugadi** → asset ishlab chiqarish / Faza 10 (offline-PWA) / aytib_ber (#10)
 - Keyingi: [[04-Vazifalar/Jarayonda|🔄 Jarayonda]] · [[04-Vazifalar/Backlog|📥 Backlog]]

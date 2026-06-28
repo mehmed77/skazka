@@ -6,7 +6,17 @@ SRS navbati, o'yin renderi — bu fazada YO'Q (faqat ma'lumot).
 
 from rest_framework import serializers
 
-from .models import GameType, Lesson, LessonStep, Letter, Level, Theme, Word
+from .models import (
+    GameType,
+    Lesson,
+    LessonStep,
+    Letter,
+    Level,
+    Song,
+    Story,
+    Theme,
+    Word,
+)
 
 # Yosh diapazoni tartibi (3-4 < 5-6 < 6-7)
 AGE_RANK = {"3-4": 0, "5-6": 1, "6-7": 2}
@@ -93,6 +103,67 @@ class ResolvedLetterSerializer(serializers.ModelSerializer):
         return _media_url(obj.mnemonic_image)
 
 
+# ── Faza 9: ertak (choose-path, chiziqli) + qo'shiq (lyrics + highlight) ──
+class ResolvedStoryNodeSerializer(serializers.Serializer):
+    """Ertak sahnasi — narration (text/audio) + visual + comprehension nishoni (prompt_word).
+
+    choices_json konvensiyasi: comprehension gate → {"prompt_word_id": "<uuid>"} (frontend
+    buildOptions bilan §4.4 distraktor quradi). Narration sahnasi → bo'sh. Tarmoq (next_node)
+    struktura kelajak uchun qoldirilgan; 1-ertak CHIZIQLI (order bo'yicha).
+    """
+
+    order = serializers.IntegerField()
+    text = serializers.CharField()
+    audio_url = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
+    prompt_word = serializers.SerializerMethodField()
+
+    def get_audio_url(self, obj):
+        return _media_url(obj.audio)
+
+    def get_image_url(self, obj):
+        return _media_url(obj.image)
+
+    def get_prompt_word(self, obj):
+        cfg = obj.choices_json if isinstance(obj.choices_json, dict) else {}
+        wid = cfg.get("prompt_word_id")
+        if not wid:
+            return None
+        w = Word.objects.filter(id=wid).first()
+        return ResolvedWordSerializer(w, context=self.context).data if w else None
+
+
+class ResolvedStorySerializer(serializers.ModelSerializer):
+    nodes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Story
+        fields = ["id", "title", "nodes"]
+
+    def get_nodes(self, obj):
+        nodes = obj.nodes.all().order_by("order")
+        return ResolvedStoryNodeSerializer(nodes, many=True, context=self.context).data
+
+
+class ResolvedSongSerializer(serializers.ModelSerializer):
+    audio_url = serializers.SerializerMethodField()
+    words = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Song
+        fields = ["id", "title", "audio_url", "lyrics_json", "words"]
+
+    def get_audio_url(self, obj):
+        return _media_url(
+            obj.audio
+        )  # null → frontend TTS placeholder (real qo'shiq audiosi keyin)
+
+    def get_words(self, obj):
+        return ResolvedWordSerializer(
+            obj.words.all(), many=True, context=self.context
+        ).data
+
+
 # ── Lesson detali (config_json RESOLVE) ──────────────────────
 class LessonStepSerializer(serializers.ModelSerializer):
     new_items = serializers.SerializerMethodField()
@@ -121,15 +192,29 @@ class LessonStepSerializer(serializers.ModelSerializer):
         out = []
         for g in obj.config_json.get("games", []):
             gt = gt_map.get(g.get("type"))
-            out.append(
-                {
-                    **g,  # config'dagi parametrlar (distractors, pair_mode, ...)
-                    "name_uz": gt.name_uz if gt else None,
-                    "name_ru": gt.name_ru if gt else None,
-                    "min_age_band": gt.min_age_band if gt else None,
-                    "schema": gt.schema_json if gt else {},
-                }
-            )
+            item = {
+                **g,  # config'dagi parametrlar (distractors, pair_mode, story_id, song_id, ...)
+                "name_uz": gt.name_uz if gt else None,
+                "name_ru": gt.name_ru if gt else None,
+                "min_age_band": gt.min_age_band if gt else None,
+                "schema": gt.schema_json if gt else {},
+            }
+            # Faza 9: ertak/qo'shiq kontent konteynerini RESOLVE qilish (item emas — spec'da)
+            if g.get("story_id"):
+                story = Story.objects.filter(id=g["story_id"]).first()
+                item["story"] = (
+                    ResolvedStorySerializer(story, context=self.context).data
+                    if story
+                    else None
+                )
+            if g.get("song_id"):
+                song = Song.objects.filter(id=g["song_id"]).first()
+                item["song"] = (
+                    ResolvedSongSerializer(song, context=self.context).data
+                    if song
+                    else None
+                )
+            out.append(item)
         return out
 
 
@@ -159,14 +244,40 @@ class LessonDetailSerializer(serializers.ModelSerializer):
 # ── Kurikulum daraxti (age_band filtri) ──────────────────────
 class CurriculumLessonSerializer(serializers.ModelSerializer):
     progress = serializers.SerializerMethodField()
+    kind = serializers.SerializerMethodField()  # Faza 9: dars-tanlovchi ikonasi uchun
 
     class Meta:
         model = Lesson
-        fields = ["id", "order", "title_uz", "title_ru", "min_age_band", "progress"]
+        fields = [
+            "id",
+            "order",
+            "title_uz",
+            "title_ru",
+            "min_age_band",
+            "progress",
+            "kind",
+        ]
 
     def get_progress(self, obj):
         # Faza 6 (SRS/rivoj) to'ldiradi. Hozir stub — struktura tayyor.
         return {"status": "available"}
+
+    def get_kind(self, obj):
+        """Dars turi (mexanikalaridan) — frontend dars-tanlovchida ikona ko'rsatadi."""
+        types = set()
+        for step in obj.steps.all():
+            for g in (step.config_json or {}).get("games", []):
+                if g.get("type"):
+                    types.add(g["type"])
+        if "sehrli_ertak" in types:
+            return "story"
+        if "qoshiq" in types:
+            return "song"
+        if "soz_qur" in types:
+            return "word_build"
+        if types & {"harf_ovi", "qaysi_tovush", "harf_chiz"}:
+            return "letter"
+        return "word"
 
 
 class CurriculumThemeSerializer(serializers.ModelSerializer):

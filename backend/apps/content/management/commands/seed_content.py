@@ -15,7 +15,10 @@ from apps.content.models import (
     LessonStep,
     Letter,
     Level,
+    Song,
     StepKind,
+    Story,
+    StoryNode,
     Theme,
     Word,
 )
@@ -411,6 +414,9 @@ class Command(BaseCommand):
         # Alifbo mavzusi + darslari (harf mexanikalari + so'z qurish)
         self._seed_alphabet(level, ru)
 
+        # Faza 9: Hayvonlar mavzusi ICHIDA ertak + qo'shiq darslari (mavzu so'zlaridan — TPRS RICH)
+        self._seed_stories_songs(ru)
+
         # Geymifikatsiya katalogi (Faza 8) — idempotent
         for i, (key, uz, ru_t, cat, icon, rule) in enumerate(ACHIEVEMENTS, start=1):
             Achievement.objects.get_or_create(
@@ -626,3 +632,93 @@ class Command(BaseCommand):
             LessonStep.objects.update_or_create(
                 lesson=lesson2, order=o, defaults={"kind": k, "config_json": cfg}
             )
+
+    def _seed_stories_songs(self, ru):
+        """Hayvonlar mavzusi ICHIDA ertak (chiziqli, comprehension gate) + qo'shiq darslari."""
+        theme = Theme.objects.filter(key="animals_home").first()
+        if not theme:
+            return
+        koshka = Word.objects.filter(language=ru, lemma="кошка").first()
+        sobaka = Word.objects.filter(language=ru, lemma="собака").first()
+        korova = Word.objects.filter(language=ru, lemma="корова").first()
+        if not (koshka and sobaka and korova):
+            return
+
+        # ── Ertak (CHIZIQLI: narration + comprehension gate; distraktor frontend §4.4) ──
+        story, _ = Story.objects.get_or_create(
+            level=theme.level, title="Mishkaning o'rmon do'stlari"
+        )
+        nodes = [
+            (1, "O'rmonda Mishka sayrga chiqdi.", {}),
+            (
+                2,
+                "Mishka mushukni qidirdi. Mushuk qani?",
+                {"prompt_word_id": str(koshka.id)},
+            ),
+            (3, "Keyin it hurdi. It qani?", {"prompt_word_id": str(sobaka.id)}),
+            (
+                4,
+                "Mishka sigirni ko'rdi. Sigir qani?",
+                {"prompt_word_id": str(korova.id)},
+            ),
+            (5, "Mishka hamma do'stlarini topdi! Ofarin!", {}),
+        ]
+        for order, text, choices in nodes:
+            StoryNode.objects.update_or_create(
+                story=story,
+                order=order,
+                defaults={"text": text, "choices_json": choices},
+            )
+
+        # ── Qo'shiq (lyrics + so'z highlight; audio = asset slot, exposure) ──
+        song, _ = Song.objects.get_or_create(theme=theme, title="Hayvonlar qo'shig'i")
+        song.lyrics_json = [
+            {"text": "Мяу, мяу — кошка!", "word_id": str(koshka.id)},
+            {"text": "Гав, гав — собака!", "word_id": str(sobaka.id)},
+            {"text": "Му, му — корова!", "word_id": str(korova.id)},
+        ]
+        song.save(update_fields=["lyrics_json"])
+        song.words.set([koshka, sobaka, korova])
+
+        # ── Darslar (Hayvonlar mavzusi ichida; new_items = mavzu so'zlari = §4.4 pool + SRS) ──
+        animal_items = [{"type": "word", "id": str(w.id)} for w in theme.words.all()]
+        ls_story, _ = Lesson.objects.get_or_create(
+            theme=theme,
+            order=2,
+            defaults={
+                "title_uz": "Hayvonlar ertagi",
+                "title_ru": "Сказка",
+                "min_age_band": "5-6",
+            },
+        )
+        LessonStep.objects.update_or_create(
+            lesson=ls_story,
+            order=1,
+            defaults={
+                "kind": StepKind.PRACTICE,
+                "config_json": {
+                    "new_items": animal_items,
+                    "games": [{"type": "sehrli_ertak", "story_id": str(story.id)}],
+                },
+            },
+        )
+        ls_song, _ = Lesson.objects.get_or_create(
+            theme=theme,
+            order=3,
+            defaults={
+                "title_uz": "Hayvonlar qo'shig'i",
+                "title_ru": "Песенка",
+                "min_age_band": "3-4",
+            },
+        )
+        LessonStep.objects.update_or_create(
+            lesson=ls_song,
+            order=1,
+            defaults={
+                "kind": StepKind.PRACTICE,
+                "config_json": {
+                    "new_items": animal_items,
+                    "games": [{"type": "qoshiq", "song_id": str(song.id)}],
+                },
+            },
+        )

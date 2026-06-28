@@ -64,8 +64,10 @@ def test_seed_content_idempotent():
     assert (
         Letter.objects.count() == 23
     )  # 1-guruh (8) + mavzu so'zlari harflari (Faza 7)
-    assert Lesson.objects.count() == 4  # 2 mavzu darsi + alifbo (harf + so'z qurish)
-    assert LessonStep.objects.count() == 12  # 4 dars × 3 qadam
+    assert (
+        Lesson.objects.count() == 6
+    )  # 2 mavzu + alifbo (2) + Hayvonlar ertak/qo'shiq (Faza 9)
+    assert LessonStep.objects.count() == 14  # 4×3 (so'z/alifbo) + 2×1 (ertak/qo'shiq)
 
 
 @pytest.mark.django_db
@@ -204,6 +206,31 @@ def test_lesson_resolves_config(api, parent):
     eb = next(g for g in practice["games"] if g["type"] == "eshit_va_bos")
     assert eb["schema"]  # GameType.schema_json birga keldi
     assert r.has_header("ETag")
+
+
+@pytest.mark.django_db
+def test_lesson_resolves_story_and_song(api, parent):
+    """Faza 9: ertak/qo'shiq darslari game.story/game.song'ni RESOLVE qiladi (konteyner, item emas)."""
+    call_command("seed_content")
+    child = ChildProfile.objects.create(parent=parent, display_name="A", age_band="6-7")
+    c = _child_ctx(api, parent, child)
+
+    story_lesson = Lesson.objects.get(theme__key="animals_home", order=2)
+    r = c.get(f"/api/v1/lesson/{story_lesson.id}/")
+    assert r.status_code == 200
+    game = r.data["steps"][0]["games"][0]
+    assert game["type"] == "sehrli_ertak"
+    assert game["story"]["nodes"]  # sahnalar resolve qilingan
+    gates = [n for n in game["story"]["nodes"] if n["prompt_word"]]
+    assert (
+        gates and gates[0]["prompt_word"]["lemma"]
+    )  # comprehension gate so'zi resolve qilingan
+
+    song_lesson = Lesson.objects.get(theme__key="animals_home", order=3)
+    r2 = c.get(f"/api/v1/lesson/{song_lesson.id}/")
+    sgame = r2.data["steps"][0]["games"][0]
+    assert sgame["type"] == "qoshiq"
+    assert sgame["song"]["words"] and sgame["song"]["lyrics_json"]
 
 
 @pytest.mark.django_db

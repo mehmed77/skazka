@@ -4,9 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Mishka } from "@/components/Mishka";
+import { BottomSheet } from "@/components/ui";
 import { childTokenStore } from "@/lib/child";
 import { cn } from "@/lib/cn";
 import { fetchCurriculum, fetchDue, fetchForest } from "@/lib/contentApi";
@@ -21,6 +22,15 @@ const STATUS: Record<ThemeStatus, { icon: string; ring: string; bg: string }> = 
   available: { icon: "✨", ring: "ring-status-available/60", bg: "bg-brand-100" },
   started: { icon: "▶️", ring: "ring-status-started/60", bg: "bg-accent/15" },
   done: { icon: "⭐", ring: "ring-status-done/60", bg: "bg-success/15" },
+};
+
+// Dars turi → ikona (dars-tanlovchi; matnsiz + nom audio bilan)
+const LESSON_ICON: Record<string, string> = {
+  word: "📚",
+  letter: "🔤",
+  word_build: "✍️",
+  story: "📖",
+  song: "🎵",
 };
 
 function themeStatus(theme: CurriculumTheme): ThemeStatus {
@@ -40,6 +50,7 @@ export default function ForestPage() {
   const reduce = useReducedMotion();
   const locale = useLocale((s) => s.locale);
   const { playCue, speakName } = useAudio();
+  const [pickerTheme, setPickerTheme] = useState<CurriculumTheme | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined" && !childTokenStore.access) {
@@ -86,12 +97,16 @@ export default function ForestPage() {
       playCue("locked");
       return;
     }
-    const lessonId = theme.lessons?.[0]?.id;
-    if (!lessonId) {
+    const lessons = theme.lessons ?? [];
+    if (lessons.length === 0) {
       playCue("soon"); // hali dars yo'q
       return;
     }
-    router.push(`/lesson/${lessonId}`); // darsni boshlash (GamePlayer)
+    if (lessons.length === 1) {
+      router.push(`/lesson/${lessons[0].id}`);
+      return;
+    }
+    setPickerTheme(theme); // >1 dars → dars-tanlovchi (so'z/ertak/qo'shiq) — Faza 9
   };
 
   return (
@@ -204,6 +219,36 @@ export default function ForestPage() {
           </ol>
         </section>
       ))}
+
+      {/* Dars-tanlovchi (>1 dars: so'z / ertak / qo'shiq) — Faza 9 (matnsiz ikona + nom audio) */}
+      <BottomSheet open={!!pickerTheme} onClose={() => setPickerTheme(null)}>
+        {pickerTheme && (
+          <div className="space-y-3">
+            <h2 className="text-center text-lg font-extrabold text-brand-700">
+              {pick(pickerTheme.title_uz, pickerTheme.title_ru)}
+            </h2>
+            <div className="flex flex-col gap-2">
+              {(pickerTheme.lessons ?? []).map((l) => (
+                <button
+                  key={l.id}
+                  type="button"
+                  data-lesson-kind={l.kind}
+                  onClick={() => {
+                    speakName(pick(l.title_uz, l.title_ru));
+                    router.push(`/lesson/${l.id}`);
+                  }}
+                  className="flex items-center gap-3 rounded-blob bg-card p-4 shadow-soft transition active:scale-95 hover:scale-105"
+                >
+                  <span className="text-3xl">{LESSON_ICON[l.kind] ?? "📚"}</span>
+                  <span className="text-base font-bold leading-tight">
+                    {pick(l.title_uz, l.title_ru)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </BottomSheet>
     </div>
   );
 }

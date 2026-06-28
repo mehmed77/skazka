@@ -82,6 +82,26 @@ export async function autoPlayLesson(page: Page) {
       continue;
     }
 
+    // sehrli_ertak: narration → "Davom etish"; comprehension gate → to'g'ri so'z (data-target)
+    if (await page.locator('[data-game="sehrli_ertak"]').count()) {
+      const target = await page.locator('[data-game="sehrli_ertak"]').first().getAttribute("data-target");
+      if (target) {
+        await page.locator(`[data-option="${target}"]`).first().click();
+        await page.waitForTimeout(1450);
+      } else {
+        await page.getByLabel("Davom etish").click();
+        await page.waitForTimeout(300);
+      }
+      continue;
+    }
+
+    // qoshiq: passiv tinglash → "Tugatish" (✓)
+    if (await page.locator('[data-game="qoshiq"]').count()) {
+      await page.getByLabel("Tugatish").click();
+      await page.waitForTimeout(400);
+      continue;
+    }
+
     // harf_chiz: kontur ustida chizish (bir nechta shtrix → yetarli qoplanish)
     if (await page.locator('[data-game="harf_chiz"]').count()) {
       const box = await page.locator("[data-trace-canvas]").first().boundingBox();

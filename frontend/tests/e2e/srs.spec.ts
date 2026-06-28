@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { autoPlayLesson, enterChild } from "./helpers";
+import { autoPlayLesson, enterChild, gotoLessonByTheme } from "./helpers";
 
 // Faza 6 — ko'rinmas SRS: lineer progress (xaritada mavzu ochilishi) + takrorlash sahifasi.
 
@@ -13,9 +13,8 @@ test("progress LINEER: boshida Ranglar qulf; Hayvonlar o'ynalsa 'done' va Rangla
   // Boshida (lineer): 1-mavzu ochiq, 2-mavzu (Ranglar) QULF
   await expect(page.getByRole("button", { name: /Ranglar — locked/ })).toBeVisible();
 
-  // Hayvonlar darsini to'liq o'ynash (autoPlay → barcha javob to'g'ri)
-  await page.getByRole("button", { name: /Hayvonlar/ }).click();
-  await expect(page).toHaveURL(/\/lesson\/[0-9a-f-]+/);
+  // Hayvonlar SO'Z darsini to'liq o'ynash (Hayvonlar endi ko'p-darsli — to'g'ridan word darsiga)
+  await gotoLessonByTheme(page, "animals_home", 1);
   await autoPlayLesson(page);
   await expect(page.locator('[data-phase="result"]')).toBeVisible();
   await page.getByLabel("Uyga").click();

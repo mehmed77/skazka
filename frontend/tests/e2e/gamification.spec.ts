@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { autoPlayLesson, enterChild } from "./helpers";
+import { autoPlayLesson, enterChild, gotoLessonByTheme } from "./helpers";
 
 // Faza 8 — geymifikatsiya (o'rmonni jonlantirish) + ota-ona paneli (REAL SRS).
 
@@ -10,8 +10,8 @@ test("mukofot o'rmonni boyitadi + ota-ona paneli REAL SRS rivojini ko'rsatadi", 
   test.setTimeout(200_000);
   await enterChild(page, { childName: "Olim", ageBand: "6-7" });
 
-  // Hayvonlar darsini to'liq o'ynash → so'zlar o'zlashtiriladi → mukofot ochiladi
-  await page.getByRole("button", { name: /Hayvonlar/ }).click();
+  // Hayvonlar SO'Z darsini to'liq o'ynash → so'zlar o'zlashtiriladi → mukofot ochiladi
+  await gotoLessonByTheme(page, "animals_home", 1);
   await autoPlayLesson(page);
   await expect(page.locator('[data-phase="result"]')).toBeVisible();
 

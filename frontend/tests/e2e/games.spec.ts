@@ -7,6 +7,8 @@ import { autoPlayLesson, enterChild } from "./helpers";
 async function startHayvonlar(page: import("@playwright/test").Page) {
   await enterChild(page);
   await page.getByRole("button", { name: /Hayvonlar/ }).click();
+  // Hayvonlar endi ko'p-darsli (so'z + qo'shiq) → dars-tanlovchi; so'z darsini tanlaymiz (Faza 9)
+  await page.locator('[data-lesson-kind="word"]').first().click();
   await expect(page).toHaveURL(/\/lesson\/[0-9a-f-]+/);
   await expect(page.locator('[data-phase="intro"]')).toBeVisible();
   await page.getByLabel("Boshlash").click();

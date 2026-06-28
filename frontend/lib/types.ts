@@ -32,6 +32,7 @@ export type CurriculumLesson = {
   title_ru: string;
   min_age_band: AgeBand;
   progress: { status: string };
+  kind: string; // word | letter | word_build | story | song (Faza 9 — dars-tanlovchi ikonasi)
 };
 export type CurriculumTheme = {
   id: string;

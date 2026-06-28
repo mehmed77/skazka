@@ -9,4 +9,6 @@ import "./HarfOvi";
 import "./QaysiTovush";
 import "./HarfChiz";
 import "./SozQur";
-// Faza 9: import "./SehrliErtak"; ...
+// Faza 9 — ertak + qo'shiq
+import "./SehrliErtak";
+import "./Qoshiq";

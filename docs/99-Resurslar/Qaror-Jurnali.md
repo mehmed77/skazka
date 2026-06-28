@@ -33,6 +33,7 @@ created: 2026-06-26
 | [[#ADR-013 — SRS dvigateli: izolyatsiyalangan scheduler + idempotent event + polimorfik ItemState\|ADR-013]] | SRS yadrosi (Faza 6) | ✅ qabul qilingan |
 | [[#ADR-014 — Harf mexanikalari: acceptsItemTypes + schedule(dimension) + yumshoq tracing\|ADR-014]] | Trek A alifbo (Faza 7) | ✅ qabul qilingan |
 | [[#ADR-015 — Geymifikatsiya: ichki-yo'naltirilgan + SRS'dan + ota-ona paneli\|ADR-015]] | Geymifikatsiya + ota-ona paneli (Faza 8) | ✅ qabul qilingan |
+| [[#ADR-016 — Ertak/qo'shiq: kontent konteyner + comprehension §4.4 + mavzu ichida\|ADR-016]] | Sehrli ertak + qo'shiq (Faza 9) | ✅ qabul qilingan |
 
 ---
 
@@ -300,6 +301,37 @@ kengaytirildi); (2) bo'sh navbat → mexanika qotib qoladi (markaziy guard + Juf
 (min 1 yulduz, doim ijobiy); (4) `buildOptions` ≥2 variant kafolati (kichik pool graceful);
 (5) refetch'da navbat qayta aralashardi → `lesson.id` depKey + `staleTime`. Faza 6 kontraktini
 mustahkamlash: **`useSessionQueue` hook** — due-ulanish bitta joyda, GamePlayer abadiy o'zgarmaydi.
+
+---
+
+## ADR-016 — Ertak/qo'shiq: kontent konteyner + comprehension §4.4 + mavzu ichida
+**Holat:** ✅ qabul qilingan · Faza 9 · 2026-06-28
+
+**Kontekst.** SPEC §5 #8–9: sehrli_ertak (TPRS, choose-path) + qo'shiq (ko'p sezgili). Story/StoryNode/Song
+modellari Faza 2'da bor. Asset (narration/qo'shiq audiosi) PARALLEL ishlab chiqariladi — kod TTS placeholder
+bilan strukturani test qiladi (real qo'shiq audiosi — eng murakkab asset — keyin tushadi).
+
+**Qaror 1 — Story/Song = kontent KONTEYNER (item EMAS).** `get_games` o'yin `story_id`/`song_id`'ni resolve
+qiladi → `game.story`/`game.song` (spec'da). Mexanika `spec.story/spec.song`'dan o'qiydi; SRS itemlari =
+new_items (mustahkamlanadigan so'zlar). Comprehension distraktori **§4.4 `buildOptions` QAYTA ISHLATILADI**
+(ertak qo'lda distraktor yozmaydi — semantik interferensiyadan himoyalangan).
+
+**Qaror 2 — 1-ertak CHIZIQLI.** `choices_json/next_node` struktura tarmoqni qo'llab-quvvatlaydi (kelajak),
+lekin 1-ertak chiziqli: narration sahnalar + comprehension gate (to'g'ri so'z → keyingi; xato → qayta, jazo
+yo'q). Tarmoqli ertak keyin — struktura tayyor, arzon qo'shiladi (Faza 2.5 mantig'i).
+
+**Qaror 3 — Qo'shiq audiosi = ASSET SLOT; exposure = intro kabi.** Real qo'shiq keyin; hozir TTS placeholder
++ so'z highlight. Exposure (Faza 6 `recordExposure`): so'z ItemState'ga kiradi, strength OSHMAYDI (passiv
+tinglash TANISHTIRADI, aktiv retrieval MUSTAHKAMLAYDI — pedagogik to'g'ri).
+
+**Qaror 4 — Mavzu ICHIDA (alohida "Ertaklar" mavzu EMAS).** Ertak/qo'shiq Hayvonlar mavzusiga DARS sifatida
+qo'shiladi — TPRS RICH (mavzu so'zlaridan), lineer progression (so'z→ertak→qo'shiq), vertikal-tilim mos.
+Natija: ko'p-darsli mavzu → **dars-tanlovchi** (forest theme bosilsa >1 dars → BottomSheet; lesson `kind`
+ikonasi). Bu Faza 7 Alifbo (2 dars) navigatsiya bo'shlig'ini ham yopadi.
+
+**Oqibat.** sehrli_ertak/qoshiq registry plugin (GamePlayer o'zgarmadi); ertak comprehension §4.4 himoyalangan;
+qo'shiq exposure (asset slot); Hayvonlar = so'z + ertak + qo'shiq darslari (dars-tanlovchi). pytest 57/57,
+Playwright; Faza 5/6/7/8 saqlandi. Qarang [[06-Modullar/Oyin-Mexanikalari]], [[06-Modullar/Kontent]].
 
 ---
 

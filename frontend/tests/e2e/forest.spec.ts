@@ -12,9 +12,11 @@ test("o'rmon xaritasi REAL curriculum'dan quriladi + Mishka idle", async ({ page
   await expect(page.locator('[data-mishka-state="idle"]')).toBeVisible();
 });
 
-test("Theme bosilsa → dars boshlanadi (intro) + audio (audio-birinchi)", async ({ page }) => {
+test("Theme → dars-tanlovchi → so'z darsi (intro) + audio (audio-birinchi)", async ({ page }) => {
   await enterChild(page);
   await page.getByRole("button", { name: /Hayvonlar/ }).click();
+  // Hayvonlar >1 dars (so'z + qo'shiq) → dars-tanlovchi (Faza 9); so'z darsini tanlaymiz
+  await page.locator('[data-lesson-kind="word"]').first().click();
   await expect(page).toHaveURL(/\/lesson\/[0-9a-f-]+/);
   // intro: yangi so'zlar (matnsiz, rasm/emoji) + Mishka
   await expect(page.locator('[data-phase="intro"]')).toBeVisible();

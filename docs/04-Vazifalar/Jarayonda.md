@@ -13,21 +13,21 @@ created: 2026-06-26
 > bu yerga ko'chiriladi, tugaganda `[x]` qilinib [[04-Vazifalar/Bajarilgan|Bajarilgan]]'ga o'tadi.
 
 > [!info] Hozirgi holat
-> **Faza 0, 1, 2, 2.5, 3, 4, 5, 6, 7, 8** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da.
-> Hozir taxta **bo'sh**: Faza 9 (sehrli ertak + qo'shiq) tayyorgarlik.
+> **Faza 0–9** yakunlandi — natijalar [[04-Vazifalar/Bajarilgan|✅ Bajarilgan]]'da. 11 mexanikadan 9 tasi tayyor.
+> Hozir taxta **bo'sh**: asset ishlab chiqarish (parallel) / Faza 10 / aytib_ber tayyorgarlik.
 
-## 🟡 Faza 9 ga tayyorgarlik
-Faza 9 ([[SPEC]] §5 #8–9) — sehrli_ertak (TPRS, tanlovli yo'l) + qo'shiq (ko'p sezgili). Registry plugin (ADR-012).
+## 🟡 Keyingi tayyorgarlik
+Kod tomonida 9 mexanika + SRS + geymifikatsiya + ertak/qo'shiq tayyor. Qolgan yo'nalishlar:
 
-- [ ] **Story/StoryNode + Song kontenti** seed + resolve (modellar Faza 2'da bor — content app) #modul/content → [[06-Modullar/Kontent]]
-- [ ] **sehrli_ertak** mexanikasi: kontentdan tanlovli yo'l (TPRS) — registry plugin, reseptiv #modul/games → [[06-Modullar/Oyin-Mexanikalari]]
-- [ ] **qo'shiq** mexanikasi: audio + so'z highlight (ko'p sezgili) — registry plugin #modul/games
-- [ ] Yangi kontent → SRS/gamification avtomatik (acceptsItemTypes + evaluate_rewards o'zgarmaydi)
+- [ ] **Asset ishlab chiqarish** (parallel oqim): jonli Mishka (Lottie), native-speaker audio (so'z/narration/qo'shiq), AI rasmlar — barcha SLOTLAR tayyor (kod o'zgarmaydi) #modul/design → [[06-Modullar/Media]]
+- [ ] **Faza 10** ([[SPEC]] §10) — to'liq offline/PWA cache + outbox heartbeat (poydevor Faza 6'da) #modul/frontend
+- [ ] **aytib_ber** (#10, ASR — ekspressiv ovozli) — ovoz tanish infra (Faza 11) #modul/games
+- [ ] Yangi mavzu/kontent (ranglar ertagi/qo'shig'i, yangi mavzular) — struktura tayyor, faqat seed
 
 > [!tip] Pull nomzodlari (WIP ≤ 3)
-> 1. Story/Song seed + resolve + sehrli_ertak (tanlovli) mexanikasi `#prioritet/medium`
-> 2. qo'shiq (audio+highlight) mexanikasi — registry plugin `#prioritet/medium`
-> 3. Asset ishlab chiqarish (jonli Mishka/audio/rasm — slotlar tayyor) yoki Faza 10 (offline/PWA) `#prioritet/low`
+> 1. Asset ishlab chiqarish (Hayvonlar vertikal tilim — real audio/rasm/Mishka) `#prioritet/high`
+> 2. Faza 10 offline/PWA (outbox heartbeat + service worker cache) `#prioritet/medium`
+> 3. aytib_ber (ASR) yoki yangi mavzular kontenti `#prioritet/low`
 
 ## ⛔ Bloklangan (Blocked)
 _(Yo'q)_

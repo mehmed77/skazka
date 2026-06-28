@@ -16,12 +16,32 @@ export type ResolvedItem = {
   sound_ipa?: string;
 };
 
+// Faza 9 — ertak/qo'shiq kontent konteynerlari (item EMAS — spec'da keladi)
+export type StoryNode = {
+  order: number;
+  text: string;
+  audio_url: string | null;
+  image_url: string | null;
+  prompt_word: ResolvedItem | null; // comprehension gate (null = narration)
+};
+export type ResolvedStory = { id: string; title: string; nodes: StoryNode[] };
+export type LyricLine = { text: string; word_id?: string };
+export type ResolvedSong = {
+  id: string;
+  title: string;
+  audio_url: string | null;
+  lyrics_json: LyricLine[];
+  words: ResolvedItem[];
+};
+
 export type GameSpec = {
   type: string;
   name_uz?: string;
   schema?: Record<string, unknown>;
   distractors?: { source?: string; exclude_confusable?: boolean };
   pair_mode?: string;
+  story?: ResolvedStory | null; // sehrli_ertak
+  song?: ResolvedSong | null; // qoshiq
 };
 
 export type AnswerResult = {

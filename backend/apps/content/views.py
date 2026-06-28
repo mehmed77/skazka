@@ -59,7 +59,7 @@ class CurriculumView(APIView):
             lang = Language.objects.filter(code="ru").first()
             levels = (
                 Level.objects.filter(language=lang)
-                .prefetch_related("themes__lessons")
+                .prefetch_related("themes__lessons__steps")
                 .order_by("order")
                 if lang
                 else Level.objects.none()
